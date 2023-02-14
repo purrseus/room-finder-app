@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '../../../assets/theme/colors';
@@ -6,10 +7,15 @@ import Spacer from '../../../components/Spacer';
 import { alphaHexColor, shadowGenerator } from '../../../utils';
 
 const HomeItem = () => {
+  const navigation = useNavigation();
+  const goToDetail = () => {
+    navigation.navigate('DetailPost');
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={1}
-      onPress={() => null}
+      onPress={goToDetail}
       style={styles.container}
     >
       <Image

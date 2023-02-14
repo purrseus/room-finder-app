@@ -4,6 +4,7 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import colors from '../assets/theme/colors';
 import globalStyles from '../assets/theme/globalStyles';
+import DetailPost from '../screens/app/DetailPost';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import useAuthStore from '../stores/useAuthStore';
@@ -21,6 +22,7 @@ const UnprotectedScreens = (
 const ProtectedScreens = (
   <Stack.Group>
     <Stack.Screen name="BottomTab" component={BottomTab} />
+    <Stack.Screen name="DetailPost" component={DetailPost} />
   </Stack.Group>
 );
 

@@ -1,13 +1,28 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, Text, View, Image as RNImage } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image as RNImage,
+  TouchableOpacity,
+} from 'react-native';
 import colors from '../../../assets/theme/colors';
 import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
 import { alphaHexColor, shadowGenerator } from '../../../utils';
 
 const SearchItem = () => {
+  const navigation = useNavigation();
+  const goToDetail = () => {
+    navigation.navigate('DetailPost');
+  };
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      onPress={goToDetail}
+      activeOpacity={1}
+      style={styles.container}
+    >
       <Image
         source={{ uri: 'https://picsum.photos/1000/1000' }}
         style={styles.image}
@@ -47,7 +62,7 @@ const SearchItem = () => {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
