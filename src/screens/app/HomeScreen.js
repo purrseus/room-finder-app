@@ -1,11 +1,9 @@
 import { useScrollToTop } from '@react-navigation/native';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   FlatList,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+  Text, View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
@@ -20,7 +18,6 @@ import HomeItem from './components/HomeItem';
 
 const HomeScreen = () => {
   const scrollRef = useRef(null);
-  const { bottom } = useSafeAreaInsets();
 
   useScrollToTop(scrollRef);
 
@@ -39,8 +36,8 @@ const HomeScreen = () => {
           />
           <Button title="Tìm kiếm" onPress={onSearch} style={styles.button} />
         </LargeCard>
-        <View style={styles.titleListContainer}>
-          <Text style={styles.titleList}>Danh sách phòng thêm mới</Text>
+        <View style={styles.listTitleContainer}>
+          <Text style={styles.listTitle}>Danh sách phòng thêm mới</Text>
           <Text style={styles.countItem}>{100} kết quả</Text>
         </View>
       </>
@@ -82,7 +79,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginVertical: 4,
   },
-  titleListContainer: {
+  listTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
@@ -90,7 +87,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginHorizontal: 30,
   },
-  titleList: {
+  listTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     color: alphaHexColor(colors.black, 0.6),

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '../../../assets/theme/colors';
+import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
 import { alphaHexColor, shadowGenerator } from '../../../utils';
 
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     ...shadowGenerator(8, alphaHexColor(colors.black, 0.4)),
     backgroundColor: colors.white,
-    padding: 8,
+    padding: 12,
     flexDirection: 'row',
   },
   image: {
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   perMonth: {
-    fontSize: 10,
+    fontSize: 11,
     color: alphaHexColor(colors.black, 0.6),
   },
   statusWrapper: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   },
   status: {
     flexDirection: 'row',
-    alignItems: 'centerF',
+    alignItems: 'center',
   },
   dot: {
     width: 6,

@@ -6,6 +6,7 @@ const colors = {
   primaryText: '#616161',
   input: '#F7F7F7',
   orange: '#E56C44',
+  imageBackground: '#808080',
 };
 
 export default colors;
