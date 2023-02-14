@@ -9,7 +9,7 @@ export default function App() {
     <SafeAreaProvider>
       <PaperProvider>
         <NavigationContainer>
-          <StatusBar style="dark" />
+          <StatusBar style="light" />
           <RootStack />
         </NavigationContainer>
       </PaperProvider>

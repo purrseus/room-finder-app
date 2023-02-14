@@ -5,6 +5,7 @@ const colors = {
   black: '#000000',
   primaryText: '#616161',
   input: '#F7F7F7',
+  orange: '#E56C44',
 };
 
 export default colors;

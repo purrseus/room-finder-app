@@ -39,6 +39,7 @@ const BottomTab = () => {
         tabBarItemStyle: globalStyles.flexFillCenter,
         tabBarIconStyle: { flex: 0, height: 32 },
         tabBarStyle: { height: 64 + bottom, paddingBottom: bottom, ...shadowGenerator(12) },
+        tabBarHideOnKeyboard: true,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />

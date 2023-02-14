@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  Keyboard,
-  StyleSheet, TouchableOpacity, useWindowDimensions,
+  ScrollView,
+  StyleSheet, useWindowDimensions,
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,23 +10,23 @@ import colors from '../assets/theme/colors';
 const Background = ({
   children,
   topDecorHeight = 0.3,
-  canHideKeyboard = false,
+  scrollView,
   ...props
 }) => {
   const { top } = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
+  const Component = scrollView ? ScrollView : View;
+
   return (
     <View style={styles.container}>
       <View style={[styles.topDecor, { height: height * topDecorHeight }]} />
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={canHideKeyboard ? Keyboard.dismiss : undefined}
+      <View
         style={StyleSheet.absoluteFill}
       >
         <View style={{ height: top }} />
-        <View {...props}>{children}</View>
-      </TouchableOpacity>
+        <Component {...props}>{children}</Component>
+      </View>
     </View>
   );
 };

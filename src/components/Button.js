@@ -5,7 +5,7 @@ import fonts from '../assets/theme/fonts';
 
 const Button = ({ title, style, ...props }) => {
   return (
-    <TouchableOpacity {...props} style={[styles.container, style]}>
+    <TouchableOpacity {...props} activeOpacity={1} style={[styles.container, style]}>
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );

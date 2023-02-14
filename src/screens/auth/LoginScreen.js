@@ -5,10 +5,11 @@ import colors from '../../assets/theme/colors';
 import fonts from '../../assets/theme/fonts';
 import Background from '../../components/Background';
 import Button from '../../components/Button';
+import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import Spacer from '../../components/Spacer';
 import useAuthStore from '../../stores/useAuthStore';
-import { alphaHexColor, shadowGenerator } from '../../utils';
+import { alphaHexColor } from '../../utils';
 
 const LoginScreen = ({ navigation }) => {
   const passwordInputRef = useRef(null);
@@ -26,12 +27,16 @@ const LoginScreen = ({ navigation }) => {
   const forgotPassword = () => null;
 
   return (
-    <Background canHideKeyboard style={styles.container}>
+    <Background
+      scrollView
+      scrollEnabled={false}
+      contentContainerStyle={styles.container}
+    >
       <Spacer h={64} />
       <LargeTitle>Tìm Phòng Trọ</LargeTitle>
 
       <Spacer h={32} />
-      <View style={styles.formContainer}>
+      <LargeCard>
         <Text style={styles.formTitle}>Đăng nhập để tiếp tục</Text>
         <Spacer h={16} />
         <TextInput
@@ -88,7 +93,7 @@ const LoginScreen = ({ navigation }) => {
             Quên mật khẩu
           </Text>
         </View>
-      </View>
+      </LargeCard>
     </Background>
   );
 };
@@ -96,14 +101,6 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  formContainer: {
-    borderRadius: 8,
-    backgroundColor: colors.white,
-    paddingHorizontal: 32,
-    paddingVertical: 26,
-    marginHorizontal: 32,
-    ...shadowGenerator(16, alphaHexColor(colors.black, 0.3)),
   },
   formTitle: {
     fontSize: 16,
