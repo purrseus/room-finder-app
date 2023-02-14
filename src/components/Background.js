@@ -1,18 +1,32 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  Keyboard,
+  StyleSheet, TouchableOpacity, useWindowDimensions,
+  View
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../assets/theme/colors';
 
-const Background = ({ children, topDecorHeight = '30%', ...props }) => {
+const Background = ({
+  children,
+  topDecorHeight = 0.3,
+  canHideKeyboard = false,
+  ...props
+}) => {
   const { top } = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
 
   return (
     <View style={styles.container}>
-      <View style={[styles.topDecor, { height: topDecorHeight }]} />
-      <View style={StyleSheet.absoluteFill}>
+      <View style={[styles.topDecor, { height: height * topDecorHeight }]} />
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={canHideKeyboard ? Keyboard.dismiss : undefined}
+        style={StyleSheet.absoluteFill}
+      >
         <View style={{ height: top }} />
         <View {...props}>{children}</View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

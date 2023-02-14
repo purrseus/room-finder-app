@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFonts } from 'expo-font';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import colors from '../assets/theme/colors';
@@ -29,10 +30,20 @@ const RootStack = () => {
     hasHydrated: state._hasHydrated,
   }));
 
-  if (!hasHydrated) {
-    <View style={globalStyles.flexFillCenter}>
-      <ActivityIndicator color={colors.primary} />
-    </View>;
+  const [fontsLoaded] = useFonts({
+    'BalooBhaina-Regular': require('../../assets/fonts/BalooBhaina2-Regular.ttf'),
+    'BalooBhaina-Medium': require('../../assets/fonts/BalooBhaina2-Medium.ttf'),
+    'BalooBhaina-SemiBold': require('../../assets/fonts/BalooBhaina2-SemiBold.ttf'),
+    'BalooBhaina-Bold': require('../../assets/fonts/BalooBhaina2-Bold.ttf'),
+    'BalooBhaina-ExtraBold': require('../../assets/fonts/BalooBhaina2-ExtraBold.ttf'),
+  });
+
+  if (!hasHydrated || !fontsLoaded) {
+    return (
+      <View style={globalStyles.flexFillCenter}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
   }
 
   return (

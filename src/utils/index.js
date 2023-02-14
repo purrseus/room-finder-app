@@ -19,3 +19,14 @@ export const shadowGenerator = (depth, shadowColor = colors.black) => ({
   shadowRadius: SHADOW_RADIUS_PER_DEPTH * depth,
   elevation: depth,
 });
+
+export const alphaHexColor = (hexColor, opacity) => {
+  const MIN_OPACITY = 0.066;
+  // Limit the opacity from 0 to 1
+  const opacityRange = Math.min(Math.max(opacity, 0), 1);
+  const safeOpacityValue =
+    opacityRange > 0 && opacityRange < MIN_OPACITY ? MIN_OPACITY : opacityRange;
+  const alpha = `${(safeOpacityValue * 255).toString(16)}0`.slice(0, 2);
+
+  return `${hexColor}${alpha}`;
+};
