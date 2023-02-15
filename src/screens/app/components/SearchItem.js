@@ -24,7 +24,7 @@ const SearchItem = () => {
       style={styles.container}
     >
       <Image
-        source={{ uri: 'https://picsum.photos/1000/1000' }}
+        source={{ uri: 'https://picsum.photos/300/300' }}
         style={styles.image}
       />
       <Spacer h={16} />

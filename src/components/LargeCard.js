@@ -15,9 +15,9 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
     backgroundColor: colors.white,
-    paddingHorizontal: 32,
+    paddingHorizontal: 30,
     paddingVertical: 26,
-    marginHorizontal: 32,
+    marginHorizontal: 30,
     ...shadowGenerator(16, alphaHexColor(colors.black, 0.3)),
   },
 });

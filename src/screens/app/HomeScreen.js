@@ -1,11 +1,6 @@
 import { useScrollToTop } from '@react-navigation/native';
-import React, { useCallback, useRef } from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  Text, View
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useCallback, useRef, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import colors from '../../assets/theme/colors';
 import Background from '../../components/Background';
 import Button from '../../components/Button';
@@ -16,31 +11,23 @@ import Spacer from '../../components/Spacer';
 import { alphaHexColor } from '../../utils';
 import HomeItem from './components/HomeItem';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const scrollRef = useRef(null);
+  const [searchText, setSearchText] = useState('');
 
   useScrollToTop(scrollRef);
 
-  const onSearch = () => console.log('onSearch');
+  const onSearch = () => {
+    if (searchText.trim().length)
+      navigation.navigate('DetailSearch', { searchText: searchText.trim() });
+  };
 
   const HeaderItems = useCallback(
     () => (
-      <>
-        <Spacer h={18} />
-        <LargeCard style={{ marginHorizontal: 16 }}>
-          <Text style={styles.cardTitle}>Tìm phòng trọ theo địa chỉ</Text>
-          <IconTextInput
-            iconLeft={require('../../assets/icons/map-marker/map-marker.png')}
-            placeholder="Nhập địa chỉ, vùng hoặc thành phố"
-            style={styles.input}
-          />
-          <Button title="Tìm kiếm" onPress={onSearch} style={styles.button} />
-        </LargeCard>
-        <View style={styles.listTitleContainer}>
-          <Text style={styles.listTitle}>Danh sách phòng thêm mới</Text>
-          <Text style={styles.countItem}>{100} kết quả</Text>
-        </View>
-      </>
+      <View style={styles.listTitleContainer}>
+        <Text style={styles.listTitle}>Danh sách phòng thêm mới</Text>
+        <Text style={styles.countItem}>{100} kết quả</Text>
+      </View>
     ),
     [],
   );
@@ -52,12 +39,26 @@ const HomeScreen = () => {
   return (
     <Background>
       <LargeTitle style={styles.headerTitle}>Tìm Phòng Trọ</LargeTitle>
+
+      <Spacer h={18} />
+      <LargeCard>
+        <Text style={styles.cardTitle}>Tìm phòng trọ theo địa chỉ</Text>
+        <IconTextInput
+          iconLeft={require('../../assets/icons/map-marker/map-marker.png')}
+          placeholder="Nhập địa chỉ, vùng hoặc thành phố"
+          style={styles.input}
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+        <Button title="Tìm kiếm" onPress={onSearch} style={styles.button} />
+      </LargeCard>
+
       <FlatList
         ref={scrollRef}
         data={Array.from({ length: 60 }, (_, i) => i)}
         renderItem={renderItem}
         ListHeaderComponent={HeaderItems}
-        ListFooterComponent={() => <Spacer h={140} />}
+        ListFooterComponent={() => <Spacer h={360} />}
       />
     </Background>
   );

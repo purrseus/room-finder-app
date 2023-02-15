@@ -48,7 +48,7 @@ const DetailPost = ({ navigation }) => {
         />
       </TouchableOpacity>
       <Image
-        source={{ uri: 'https://picsum.photos/1000/1000' }}
+        source={{ uri: 'https://picsum.photos/300/300' }}
         style={{ width, height: height * 0.48 }}
       />
       <View style={[styles.sheet, { height: height * 0.52 + 30 }]}>
@@ -69,20 +69,36 @@ const DetailPost = ({ navigation }) => {
           <View style={styles.twoSideContainer}>
             <View style={styles.leftContentContainer}>
               <View style={styles.row}>
-                <RNImage
-                  source={require('../../assets/icons/map-marker/map-marker.png')}
-                  style={styles.locationIcon}
-                />
+                <View style={styles.iconWrapper}>
+                  <RNImage
+                    source={require('../../assets/icons/size/size.png')}
+                    style={styles.sizeIcon}
+                  />
+                </View>
+                <Text style={styles.info} numberOfLines={1}>
+                  Diện tích: 30m2
+                </Text>
+              </View>
+              <Spacer h={8} />
+              <View style={styles.row}>
+                <View style={styles.iconWrapper}>
+                  <RNImage
+                    source={require('../../assets/icons/map-marker/map-marker.png')}
+                    style={styles.locationIcon}
+                  />
+                </View>
                 <Text style={styles.info} numberOfLines={2}>
                   16a , Ngõ 603, Phan Lương Ngọc Quyến, Thái Nguyên
                 </Text>
               </View>
               <Spacer h={8} />
               <View style={styles.row}>
-                <RNImage
-                  source={require('../../assets/icons/call/call.png')}
-                  style={styles.callIcon}
-                />
+                <View style={styles.iconWrapper}>
+                  <RNImage
+                    source={require('../../assets/icons/call/call.png')}
+                    style={styles.callIcon}
+                  />
+                </View>
                 <Text style={styles.info} numberOfLines={2}>
                   0931529903
                 </Text>
@@ -176,9 +192,11 @@ const styles = StyleSheet.create({
   },
   leftContentContainer: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   rightContentContainer: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   twoSideContainer: {
     flexDirection: 'row',
@@ -187,6 +205,16 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  iconWrapper: {
+    width: 14,
+    height: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sizeIcon: {
+    width: 14,
+    height: 14,
   },
   locationIcon: {
     width: 10,

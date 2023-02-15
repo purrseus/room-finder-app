@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
 import fonts from '../../assets/theme/fonts';
 import Background from '../../components/Background';
@@ -13,8 +14,11 @@ import { alphaHexColor } from '../../utils';
 
 const LoginScreen = ({ navigation }) => {
   const passwordInputRef = useRef(null);
+  const { bottom } = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
   const handleLogin = useAuthStore((state) => state.handleLogin);
+
+  const passwordIncorrect = true;
 
   const changeShowPasswordState = () => setShowPassword(!showPassword);
 
@@ -27,16 +31,12 @@ const LoginScreen = ({ navigation }) => {
   const forgotPassword = () => null;
 
   return (
-    <Background
-      scrollView
-      scrollEnabled={false}
-      contentContainerStyle={styles.container}
-    >
+    <Background keyboardScrollView style={styles.container}>
       <Spacer h={64} />
       <LargeTitle>Tìm Phòng Trọ</LargeTitle>
 
       <Spacer h={32} />
-      <LargeCard>
+      <LargeCard style={{ marginBottom: bottom || 32 }}>
         <Text style={styles.formTitle}>Đăng nhập để tiếp tục</Text>
         <Spacer h={16} />
         <TextInput
@@ -55,14 +55,22 @@ const LoginScreen = ({ navigation }) => {
           ref={passwordInputRef}
           mode="outlined"
           label="Password"
-          outlineStyle={styles.inputOutline}
+          outlineStyle={[
+            styles.inputOutline,
+            passwordIncorrect && { borderColor: colors.red },
+          ]}
           activeOutlineColor={colors.primary}
           contentStyle={styles.contentInput}
           style={styles.input}
           onSubmitEditing={blurPassword}
           right={
             <TextInput.Icon
-              icon={require('../../assets/icons/eye/eye.png')}
+              icon={
+                showPassword
+                  ? require('../../assets/icons/eye/eye.png')
+                  : require('../../assets/icons/eye-hidden/eye-hidden.png')
+              }
+              forceTextInputFocus={false}
               style={styles.eye}
               onPress={changeShowPasswordState}
             />
@@ -70,7 +78,9 @@ const LoginScreen = ({ navigation }) => {
           secureTextEntry={!showPassword}
         />
 
-        <Spacer h={16} />
+        {passwordIncorrect && (
+          <Text style={styles.passwordIncorrect}>Mật khẩu sai!</Text>
+        )}
 
         <Button title="Đăng nhập" onPress={handleLogin} style={styles.button} />
 
@@ -109,6 +119,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   inputOutline: {
+    borderWidth: 0.5,
     borderColor: alphaHexColor(colors.black, 0.3),
     backgroundColor: colors.white,
   },
@@ -129,6 +140,10 @@ const styles = StyleSheet.create({
   bottomButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  passwordIncorrect: {
+    fontSize: 10,
+    color: colors.red,
   },
   bottomButtonText: {
     fontSize: 12,

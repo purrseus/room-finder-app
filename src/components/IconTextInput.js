@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import colors from '../assets/theme/colors';
 import { alphaHexColor } from '../utils';
@@ -14,8 +14,16 @@ const IconTextInput = ({
   editable,
   ...props
 }) => {
+  const [isFocusing, setIsFocusing] = useState(false);
+
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[
+        styles.container,
+        isFocusing && { borderColor: colors.primary },
+        style,
+      ]}
+    >
       {!!iconLeft && (
         <View style={styles.iconWrapper}>
           <Image source={iconLeft} style={[styles.icon, iconLeftStyle]} />
@@ -23,13 +31,21 @@ const IconTextInput = ({
       )}
       <Spacer w={8} />
       {editable === false ? (
-        <Text style={[styles.input, { height: undefined, color: alphaHexColor(colors.black, 0.3) }, textInputStyle]}>
+        <Text
+          style={[
+            styles.input,
+            { height: undefined, color: alphaHexColor(colors.black, 0.3) },
+            textInputStyle,
+          ]}
+        >
           {props.placeholder}
         </Text>
       ) : (
         <TextInput
           {...props}
           selectionColor={colors.primary}
+          onFocus={() => setIsFocusing(true)}
+          onBlur={() => setIsFocusing(false)}
           style={[styles.input, textInputStyle]}
         />
       )}
@@ -50,6 +66,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 12,
+    borderWidth: 0.5,
+    borderColor: 'transparent',
   },
   iconWrapper: {
     width: 16,
@@ -63,7 +81,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     margin: 0,
     fontSize: 12,
-    height: 20,
+    height: 18,
     flex: 1,
   },
 });

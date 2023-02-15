@@ -5,6 +5,7 @@ const colors = {
   black: '#000000',
   primaryText: '#616161',
   input: '#F7F7F7',
+  red: '#FF3C3C',
   orange: '#E56C44',
   imageBackground: '#808080',
 };

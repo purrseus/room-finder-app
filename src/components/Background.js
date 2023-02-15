@@ -6,17 +6,19 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../assets/theme/colors';
+import KeyboardAwareScrollView from './KeyboardAwareScrollView';
 
 const Background = ({
   children,
   topDecorHeight = 0.3,
   scrollView,
+  keyboardScrollView,
   ...props
 }) => {
   const { top } = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
-  const Component = scrollView ? ScrollView : View;
+  const Component = keyboardScrollView ? KeyboardAwareScrollView : scrollView ? ScrollView : View;
 
   return (
     <View style={styles.container}>

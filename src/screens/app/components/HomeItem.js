@@ -20,7 +20,7 @@ const HomeItem = () => {
     >
       <Image
         style={styles.image}
-        source={{ uri: 'https://picsum.photos/500/500' }}
+        source={{ uri: 'https://picsum.photos/100/100' }}
       />
       <Spacer w={14} />
       <View style={styles.contentContainer}>
