@@ -28,6 +28,8 @@ const LoginScreen = ({ navigation }) => {
 
   const goToRegister = () => navigation.navigate('Register');
 
+  const onLogin = () => handleLogin();
+
   const forgotPassword = () => null;
 
   return (
@@ -42,7 +44,10 @@ const LoginScreen = ({ navigation }) => {
         <TextInput
           mode="outlined"
           label="Email Address"
-          outlineStyle={styles.inputOutline}
+          outlineStyle={[
+            styles.inputOutline,
+            passwordIncorrect && { borderColor: colors.red },
+          ]}
           activeOutlineColor={colors.primary}
           contentStyle={styles.contentInput}
           style={styles.input}
@@ -50,7 +55,11 @@ const LoginScreen = ({ navigation }) => {
           returnKeyType="next"
           onSubmitEditing={focusPassword}
         />
-        <Spacer h={4} />
+
+        {passwordIncorrect && (
+          <Text style={styles.passwordIncorrect}>Định dạng sai!</Text>
+        )}
+
         <TextInput
           ref={passwordInputRef}
           mode="outlined"
@@ -62,6 +71,7 @@ const LoginScreen = ({ navigation }) => {
           activeOutlineColor={colors.primary}
           contentStyle={styles.contentInput}
           style={styles.input}
+          returnKeyType="done"
           onSubmitEditing={blurPassword}
           right={
             <TextInput.Icon
@@ -82,7 +92,7 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.passwordIncorrect}>Mật khẩu sai!</Text>
         )}
 
-        <Button title="Đăng nhập" onPress={handleLogin} style={styles.button} />
+        <Button title="Đăng nhập" onPress={onLogin} style={styles.button} />
 
         <View style={styles.bottomButton}>
           <View style={{ flexDirection: 'row' }}>
@@ -125,7 +135,8 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 12,
-    marginVertical: 8,
+    marginBottom: 8,
+    marginTop: 4,
   },
   eye: {
     transform: [{ scale: 0.8 }],
