@@ -11,9 +11,18 @@ import { shadowGenerator } from '../utils';
 
 const bottomTabData = {
   Home: { icon: require('../assets/icons/home/home.png'), label: 'Trang Chủ' },
-  Search: { icon: require('../assets/icons/search/search.png'), label: 'Tìm Kiếm' },
-  PostManagement: { icon: require('../assets/icons/options/options.png'), label: 'Quản Lý Bài Đăng' },
-  Account: { icon: require('../assets/icons/account/account.png'), label: 'Tài Khoản' },
+  Search: {
+    icon: require('../assets/icons/search/search.png'),
+    label: 'Tìm Kiếm',
+  },
+  PostManagement: {
+    icon: require('../assets/icons/options/options.png'),
+    label: 'Quản Lý Bài Đăng',
+  },
+  Account: {
+    icon: require('../assets/icons/account/account.png'),
+    label: 'Tài Khoản',
+  },
 };
 
 const Tab = createBottomTabNavigator();
@@ -22,6 +31,7 @@ const BottomTab = () => {
   const { bottom } = useSafeAreaInsets();
   return (
     <Tab.Navigator
+      initialRouteName="PostManagement"
       sceneContainerStyle={{ backgroundColor: colors.white }}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => (
@@ -31,14 +41,20 @@ const BottomTab = () => {
           />
         ),
         tabBarLabel: ({ color }) => (
-          <Text style={[{ color }, styles.tabBarLabel]}>{bottomTabData[route.name].label}</Text>
+          <Text style={[{ color }, styles.tabBarLabel]}>
+            {bottomTabData[route.name].label}
+          </Text>
         ),
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabInactive,
         headerShown: false,
         tabBarItemStyle: globalStyles.flexFillCenter,
         tabBarIconStyle: { flex: 0, height: 32 },
-        tabBarStyle: { height: 64 + bottom, paddingBottom: bottom, ...shadowGenerator(12) },
+        tabBarStyle: {
+          height: 64 + bottom,
+          paddingBottom: bottom,
+          ...shadowGenerator(12),
+        },
         tabBarHideOnKeyboard: true,
       })}
     >

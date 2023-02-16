@@ -37,7 +37,7 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <Background>
+    <Background topDecorHeight={0.25}>
       <LargeTitle style={styles.headerTitle}>Tìm Phòng Trọ</LargeTitle>
 
       <Spacer h={18} />

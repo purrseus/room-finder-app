@@ -34,7 +34,7 @@ const DetailSearch = ({ route: { params }, navigation }) => {
   }, []);
 
   return (
-    <Background>
+    <Background topDecorHeight={0.2}>
       <View style={styles.row}>
         <TouchableOpacity
           activeOpacity={1}

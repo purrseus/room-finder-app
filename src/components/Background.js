@@ -10,7 +10,7 @@ import KeyboardAwareScrollView from './KeyboardAwareScrollView';
 
 const Background = ({
   children,
-  topDecorHeight = 0.3,
+  topDecorHeight = 0.33,
   scrollView,
   keyboardScrollView,
   ...props
