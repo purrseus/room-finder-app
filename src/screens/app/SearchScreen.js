@@ -1,5 +1,5 @@
 import { useScrollToTop } from '@react-navigation/native';
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import colors from '../../assets/theme/colors';
 import Background from '../../components/Background';

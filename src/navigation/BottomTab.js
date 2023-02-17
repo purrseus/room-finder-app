@@ -31,7 +31,6 @@ const BottomTab = () => {
   const { bottom } = useSafeAreaInsets();
   return (
     <Tab.Navigator
-      initialRouteName="PostManagement"
       sceneContainerStyle={{ backgroundColor: colors.white }}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => (

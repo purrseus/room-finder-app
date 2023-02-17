@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Text } from 'react-native';
 import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';

@@ -1,8 +1,7 @@
-import React from 'react';
 import PostForm from '../../layout/PostForm';
 
-const CreatePost = () => {
-  return <PostForm />;
+const CreatePost = ({ ...props }) => {
+  return <PostForm {...props} title="Tạo bài đăng" />;
 };
 
 export default CreatePost;

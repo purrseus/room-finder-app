@@ -1,4 +1,3 @@
-import React from 'react';
 import { Text } from 'react-native';
 import colors from '../assets/theme/colors';
 import fonts from '../assets/theme/fonts';

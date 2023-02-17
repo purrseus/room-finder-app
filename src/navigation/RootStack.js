@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
-import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import colors from '../assets/theme/colors';
 import globalStyles from '../assets/theme/globalStyles';

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { IconButton, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import Background from '../../components/Background';
 import Button from '../../components/Button';
 import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
+import OutlinedTextInput from '../../components/OutlinedTextInput';
 import Spacer from '../../components/Spacer';
 import useAuthStore from '../../stores/useAuthStore';
 import { alphaHexColor } from '../../utils';
@@ -16,11 +17,10 @@ const RegisterScreen = ({ navigation }) => {
   const emailInputRef = useRef(null);
   const passwordInputRef = useRef(null);
   const confirmPasswordInputRef = useRef(null);
+  const { bottom } = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleLogin = useAuthStore((state) => state.handleLogin);
-
-  const passwordIncorrect = true;
 
   const changeShowPasswordState = () => setShowPassword(!showPassword);
 
@@ -45,73 +45,45 @@ const RegisterScreen = ({ navigation }) => {
       <LargeTitle>Tìm Phòng Trọ</LargeTitle>
 
       <Spacer h={32} />
-      <LargeCard style={{ marginBottom: 18 }}>
+      <LargeCard style={{ marginBottom: bottom || 32 }}>
         <Text style={styles.formTitle}>Tạo tài khoản</Text>
         <Spacer h={16} />
-        <View style={{ justifyContent: 'center' }}>
-          <TextInput
-            mode="outlined"
-            label="Full Name"
-            outlineStyle={[
-              styles.inputOutline,
-              passwordIncorrect && { borderColor: colors.red },
-            ]}
-            activeOutlineColor={colors.primary}
-            contentStyle={styles.contentInput}
-            style={styles.input}
-            returnKeyType="next"
-            onSubmitEditing={focusEmail}
-          />
-          <Image
-            source={require('../../assets/icons/valid-circle/valid-circle.png')}
-            style={{ position: 'absolute', right: 20 }}
-          />
-        </View>
+        <OutlinedTextInput
+          label="Full Name"
+          returnKeyType="next"
+          onSubmitEditing={focusEmail}
+          errorMessage="Định dạng sai!"
+          CustomView={
+            <Image
+              source={require('../../assets/icons/valid-circle/valid-circle.png')}
+              style={{ position: 'absolute', right: 20 }}
+            />
+          }
+        />
 
-        {passwordIncorrect && (
-          <Text style={styles.passwordIncorrect}>Định dạng sai!</Text>
-        )}
+        <OutlinedTextInput
+          ref={emailInputRef}
+          label="Email Address"
+          keyboardType="email-address"
+          returnKeyType="next"
+          onSubmitEditing={focusPassword}
+          errorMessage="Định dạng sai!"
+          CustomView={
+            <Image
+              source={require('../../assets/icons/valid-circle/valid-circle.png')}
+              style={{ position: 'absolute', right: 20 }}
+            />
+          }
+        />
 
-        <View style={{ justifyContent: 'center' }}>
-          <TextInput
-            ref={emailInputRef}
-            mode="outlined"
-            label="Email Address"
-            outlineStyle={[
-              styles.inputOutline,
-              passwordIncorrect && { borderColor: colors.red },
-            ]}
-            activeOutlineColor={colors.primary}
-            contentStyle={styles.contentInput}
-            style={styles.input}
-            keyboardType="email-address"
-            returnKeyType="next"
-            onSubmitEditing={focusPassword}
-          />
-          <Image
-            source={require('../../assets/icons/valid-circle/valid-circle.png')}
-            style={{ position: 'absolute', right: 20 }}
-          />
-        </View>
-
-        {passwordIncorrect && (
-          <Text style={styles.passwordIncorrect}>Định dạng sai!</Text>
-        )}
-
-        <TextInput
+        <OutlinedTextInput
           ref={passwordInputRef}
-          mode="outlined"
           label="Password"
-          outlineStyle={[
-            styles.inputOutline,
-            passwordIncorrect && { borderColor: colors.red },
-          ]}
-          activeOutlineColor={colors.primary}
-          contentStyle={styles.contentInput}
-          style={styles.input}
           returnKeyType="next"
           textContentType="oneTimeCode"
           onSubmitEditing={focusConfirmPassword}
+          errorMessage="Định dạng sai!"
+          secureTextEntry={!showPassword}
           right={
             <TextInput.Icon
               icon={
@@ -124,26 +96,15 @@ const RegisterScreen = ({ navigation }) => {
               onPress={changeShowPasswordState}
             />
           }
-          secureTextEntry={!showPassword}
         />
 
-        {passwordIncorrect && (
-          <Text style={styles.passwordIncorrect}>Định dạng sai!</Text>
-        )}
-
-        <TextInput
+        <OutlinedTextInput
           ref={confirmPasswordInputRef}
-          mode="outlined"
           label="Confirm Password"
-          outlineStyle={[
-            styles.inputOutline,
-            passwordIncorrect && { borderColor: colors.red },
-          ]}
-          activeOutlineColor={colors.primary}
-          contentStyle={styles.contentInput}
-          style={styles.input}
           onSubmitEditing={blurConfirmPassword}
           returnKeyType="done"
+          secureTextEntry={!showConfirmPassword}
+          errorMessage="Định dạng sai!"
           right={
             <TextInput.Icon
               icon={
@@ -156,12 +117,7 @@ const RegisterScreen = ({ navigation }) => {
               onPress={changeShowConfirmPasswordState}
             />
           }
-          secureTextEntry={!showConfirmPassword}
         />
-
-        {passwordIncorrect && (
-          <Text style={styles.passwordIncorrect}>Định dạng sai!</Text>
-        )}
 
         <Button
           title="Tạo Tài Khoản"
@@ -194,21 +150,8 @@ const styles = StyleSheet.create({
     color: colors.primaryText,
     textAlign: 'center',
   },
-  inputOutline: {
-    borderWidth: 0.5,
-    borderColor: alphaHexColor(colors.black, 0.3),
-    backgroundColor: colors.white,
-  },
-  input: {
-    fontSize: 12,
-    marginBottom: 8,
-    marginTop: 4,
-  },
   eye: {
     transform: [{ scale: 0.8 }],
-  },
-  contentInput: {
-    fontWeight: 'bold',
   },
   button: {
     paddingVertical: 12,
@@ -217,10 +160,6 @@ const styles = StyleSheet.create({
   bottomButton: {
     flexDirection: 'row',
     justifyContent: 'center',
-  },
-  passwordIncorrect: {
-    fontSize: 10,
-    color: colors.red,
   },
   bottomButtonText: {
     fontSize: 12,

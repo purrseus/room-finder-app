@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import colors from '../assets/theme/colors';
 import { alphaHexColor } from '../utils';

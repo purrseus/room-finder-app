@@ -1,5 +1,4 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -68,7 +67,6 @@ const SearchItem = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 14,
     marginHorizontal: 30,
     borderRadius: 8,
     ...shadowGenerator(8, alphaHexColor(colors.black, 0.4)),

@@ -1,5 +1,5 @@
 import { useScrollToTop } from '@react-navigation/native';
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   FlatList,
   Image,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.white,
     textAlign: 'center',
-    top: 8,
+    top: 20,
     left: 0,
     right: 0,
     position: 'absolute',

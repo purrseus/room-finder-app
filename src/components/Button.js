@@ -1,7 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import colors from '../assets/theme/colors';
-import fonts from '../assets/theme/fonts';
 
 const Button = ({ title, style, ...props }) => {
   return (

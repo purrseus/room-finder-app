@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   KeyboardAwareScrollView as RNKeyboardAwareScrollView
 } from 'react-native-keyboard-aware-scroll-view';

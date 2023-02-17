@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import Background from '../../components/Background';
 import Button from '../../components/Button';
 import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
+import OutlinedTextInput from '../../components/OutlinedTextInput';
 import Spacer from '../../components/Spacer';
 import useAuthStore from '../../stores/useAuthStore';
 import { alphaHexColor } from '../../utils';
@@ -17,8 +18,6 @@ const LoginScreen = ({ navigation }) => {
   const { bottom } = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
   const handleLogin = useAuthStore((state) => state.handleLogin);
-
-  const passwordIncorrect = true;
 
   const changeShowPasswordState = () => setShowPassword(!showPassword);
 
@@ -41,38 +40,21 @@ const LoginScreen = ({ navigation }) => {
       <LargeCard style={{ marginBottom: bottom || 32 }}>
         <Text style={styles.formTitle}>Đăng nhập để tiếp tục</Text>
         <Spacer h={16} />
-        <TextInput
-          mode="outlined"
+        <OutlinedTextInput
           label="Email Address"
-          outlineStyle={[
-            styles.inputOutline,
-            passwordIncorrect && { borderColor: colors.red },
-          ]}
-          activeOutlineColor={colors.primary}
-          contentStyle={styles.contentInput}
-          style={styles.input}
           keyboardType="email-address"
           returnKeyType="next"
           onSubmitEditing={focusPassword}
+          errorMessage="Định dạng sai!"
         />
 
-        {passwordIncorrect && (
-          <Text style={styles.passwordIncorrect}>Định dạng sai!</Text>
-        )}
-
-        <TextInput
+        <OutlinedTextInput
           ref={passwordInputRef}
-          mode="outlined"
           label="Password"
-          outlineStyle={[
-            styles.inputOutline,
-            passwordIncorrect && { borderColor: colors.red },
-          ]}
-          activeOutlineColor={colors.primary}
-          contentStyle={styles.contentInput}
-          style={styles.input}
           returnKeyType="done"
           onSubmitEditing={blurPassword}
+          secureTextEntry={!showPassword}
+          errorMessage="Định dạng sai!"
           right={
             <TextInput.Icon
               icon={
@@ -85,12 +67,7 @@ const LoginScreen = ({ navigation }) => {
               onPress={changeShowPasswordState}
             />
           }
-          secureTextEntry={!showPassword}
         />
-
-        {passwordIncorrect && (
-          <Text style={styles.passwordIncorrect}>Mật khẩu sai!</Text>
-        )}
 
         <Button title="Đăng nhập" onPress={onLogin} style={styles.button} />
 
@@ -128,21 +105,8 @@ const styles = StyleSheet.create({
     color: colors.primaryText,
     textAlign: 'center',
   },
-  inputOutline: {
-    borderWidth: 0.5,
-    borderColor: alphaHexColor(colors.black, 0.3),
-    backgroundColor: colors.white,
-  },
-  input: {
-    fontSize: 12,
-    marginBottom: 8,
-    marginTop: 4,
-  },
   eye: {
     transform: [{ scale: 0.8 }],
-  },
-  contentInput: {
-    fontWeight: 'bold',
   },
   button: {
     paddingVertical: 12,
@@ -151,10 +115,6 @@ const styles = StyleSheet.create({
   bottomButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  passwordIncorrect: {
-    fontSize: 10,
-    color: colors.red,
   },
   bottomButtonText: {
     fontSize: 12,
