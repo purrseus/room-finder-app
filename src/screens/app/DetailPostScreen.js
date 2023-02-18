@@ -7,6 +7,7 @@ import {
   ScrollView,
   Text,
   Platform,
+  Linking,
 } from 'react-native';
 import open from 'react-native-open-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,7 +31,7 @@ const CheckItem = ({ title }) => {
   );
 };
 
-const DetailPost = ({ navigation }) => {
+const DetailPostScreen = ({ navigation }) => {
   const { top, bottom } = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
@@ -41,6 +42,8 @@ const DetailPost = ({ navigation }) => {
       console.log(error);
     }
   }
+
+  const onCallToPhoneNumber = () => Linking.openURL(`tel:${'0931529903'}`);
 
   return (
     <View style={globalStyles.flexFill}>
@@ -149,6 +152,7 @@ const DetailPost = ({ navigation }) => {
         </ScrollView>
         <Button
           title="Liên hệ"
+          onPress={onCallToPhoneNumber}
           style={[styles.button, { marginBottom: bottom || 16 }]}
         />
       </View>
@@ -288,4 +292,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailPost;
+export default DetailPostScreen;

@@ -1,7 +1,7 @@
 import PostForm from '../../layout/PostForm';
 
-const EditPost = ({ ...props }) => {
+const EditPostScreen = ({ ...props }) => {
   return <PostForm {...props} title="Chỉnh sửa bài đăng" />;
 };
 
-export default EditPost;
+export default EditPostScreen;

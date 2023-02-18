@@ -232,8 +232,6 @@ const PostForm = ({ navigation, title, handleButtonPress }) => {
             onPress={handleButtonPress}
             style={styles.button}
           />
-
-          {/* TODO: navigation header */}
         </LargeCard>
       </KeyboardAwareScrollView>
     </Background>

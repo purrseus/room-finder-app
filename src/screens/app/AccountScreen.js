@@ -1,5 +1,6 @@
 import {
   Image as RNImage,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,7 +21,7 @@ import { alphaHexColor, shadowGenerator } from '../../utils';
 const AVATAR_SIZE = 100;
 const BORDER_AVATAR_WIDTH = 4;
 
-const AccountScreen = () => {
+const AccountScreen = ({ navigation }) => {
   const handleLogout = useAuthStore((state) => state.handleLogout);
   const { height } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
@@ -30,6 +31,10 @@ const AccountScreen = () => {
     Math.random() < 0.5
       ? { uri: 'https://picsum.photos/100/100' }
       : require('../../assets/images/default-avatar.jpg');
+
+  const goToEditProfile = () => navigation.navigate('EditProfile');
+
+  const onCallToPhoneNumber = () => Linking.openURL(`tel:${'0931529903'}`);
 
   return (
     <Background topDecorHeight={0.28} style={globalStyles.flexFill}>
@@ -55,7 +60,7 @@ const AccountScreen = () => {
           <TouchableOpacity
             style={styles.callButton}
             activeOpacity={1}
-            onPress={() => null}
+            onPress={onCallToPhoneNumber}
           >
             <RNImage source={require('../../assets/icons/call/call.png')} />
             <Text style={styles.callMeText}>Call me</Text>
@@ -65,7 +70,7 @@ const AccountScreen = () => {
             <View style={styles.infoItem}>
               <Text style={styles.infoTitle}>Email</Text>
               <Text style={styles.infoContent} numberOfLines={1}>
-                asdhenry11@gmail.comsd
+                asdhenry11@gmail.com
               </Text>
             </View>
             <View style={styles.divider} />
@@ -88,7 +93,7 @@ const AccountScreen = () => {
 
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => null}
+            onPress={goToEditProfile}
             style={styles.editProfileButton}
           >
             <RNImage
@@ -105,13 +110,19 @@ const AccountScreen = () => {
           <Spacer h={12} />
 
           <View style={styles.bottomInfoContainer}>
-            <TouchableOpacity activeOpacity={1} onPress={() => null} style={styles.bottomItemContainer}>
-              <RNImage
-                source={require('../../assets/icons/help/help.png')}
-              />
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => null}
+              style={styles.bottomItemContainer}
+            >
+              <RNImage source={require('../../assets/icons/help/help.png')} />
               <Text style={styles.bottomItemTitle}>About us</Text>
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={1} onPress={handleLogout} style={styles.bottomItemContainer}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={handleLogout}
+              style={styles.bottomItemContainer}
+            >
               <RNImage
                 source={require('../../assets/icons/logout/logout.png')}
               />
@@ -252,7 +263,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: alphaHexColor(colors.black, 0.8),
     marginLeft: 14,
-  }
+  },
 });
 
 export default AccountScreen;

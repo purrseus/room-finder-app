@@ -17,7 +17,7 @@ import { alphaHexColor } from '../../utils';
 import SearchItem from './components/SearchItem';
 import globalStyles from '../../assets/theme/globalStyles';
 
-const DetailSearch = ({ route: { params }, navigation }) => {
+const DetailSearchScreen = ({ route: { params }, navigation }) => {
   const { top, bottom } = useSafeAreaInsets();
 
   const HeaderItems = useCallback(
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailSearch;
+export default DetailSearchScreen;
