@@ -15,6 +15,7 @@ import LargeCard from '../../components/LargeCard';
 import Spacer from '../../components/Spacer';
 import { alphaHexColor } from '../../utils';
 import SearchItem from './components/SearchItem';
+import globalStyles from '../../assets/theme/globalStyles';
 
 const DetailSearch = ({ route: { params }, navigation }) => {
   const { top, bottom } = useSafeAreaInsets();
@@ -34,7 +35,7 @@ const DetailSearch = ({ route: { params }, navigation }) => {
   }, []);
 
   return (
-    <Background topDecorHeight={0.2}>
+    <Background topDecorHeight={0.2} style={globalStyles.flexFill}>
       <View style={styles.row}>
         <TouchableOpacity
           activeOpacity={1}

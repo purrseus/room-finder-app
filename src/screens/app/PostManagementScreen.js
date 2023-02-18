@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
+import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
 import { alphaHexColor, shadowGenerator } from '../../utils';
 import PostManagementItem from './components/PostManagementItem';
@@ -30,7 +31,7 @@ const PostManagementScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <Background topDecorHeight={0.15} style={styles.container}>
+    <Background topDecorHeight={0.15} style={globalStyles.flexFill}>
       <Text style={styles.headerTitle}>Quản Lý Bài Đăng</Text>
 
       <View style={[styles.body, { marginTop: height * 0.15 - top }]}>
@@ -59,9 +60,6 @@ const PostManagementScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   headerTitle: {
     fontSize: 16,
     fontWeight: 'bold',

@@ -2,6 +2,7 @@ import { useScrollToTop } from '@react-navigation/native';
 import { useCallback, useRef, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import colors from '../../assets/theme/colors';
+import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
 import Button from '../../components/Button';
 import IconTextInput from '../../components/IconTextInput';
@@ -37,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <Background topDecorHeight={0.25}>
+    <Background topDecorHeight={0.25}  style={globalStyles.flexFill}>
       <LargeTitle style={styles.headerTitle}>Tìm Phòng Trọ</LargeTitle>
 
       <Spacer h={18} />

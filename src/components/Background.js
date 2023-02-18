@@ -35,7 +35,7 @@ const Background = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background,
   },
   topDecor: {
     backgroundColor: colors.primary,

@@ -4,6 +4,7 @@ import { IconButton, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
 import fonts from '../../assets/theme/fonts';
+import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
 import Button from '../../components/Button';
 import LargeCard from '../../components/LargeCard';
@@ -40,7 +41,7 @@ const RegisterScreen = ({ navigation }) => {
   const onCreateAccount = () => handleLogin();
 
   return (
-    <Background keyboardScrollView style={styles.container}>
+    <Background keyboardScrollView style={globalStyles.flexFill}>
       <Spacer h={64} />
       <LargeTitle>Tìm Phòng Trọ</LargeTitle>
 
@@ -141,9 +142,6 @@ const RegisterScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   formTitle: {
     fontSize: 16,
     fontFamily: fonts.balloBhainaExtraBold,
