@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Text,
+  Platform,
 } from 'react-native';
+import open from 'react-native-open-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
 import fonts from '../../assets/theme/fonts';
@@ -32,7 +34,13 @@ const DetailPost = ({ navigation }) => {
   const { top, bottom } = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
-  const goToMaps = () => null;
+  const goToMaps = async () => {
+    try {
+      open({ provider: Platform.OS === 'ios' ? 'apple' : 'google', query: 'Việt Yên, Bắc Giang' });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <View style={globalStyles.flexFill}>
