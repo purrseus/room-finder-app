@@ -30,3 +30,5 @@ export const alphaHexColor = (hexColor, opacity) => {
 
   return `${hexColor}${alpha}`;
 };
+
+export const focusInput = (ref) => () => ref.current?.focus();

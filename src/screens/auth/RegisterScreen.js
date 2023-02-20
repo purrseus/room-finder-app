@@ -1,7 +1,10 @@
-import { useRef, useState } from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
-import { IconButton, TextInput } from 'react-native-paper';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useMemo, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as yup from 'yup';
 import colors from '../../assets/theme/colors';
 import fonts from '../../assets/theme/fonts';
 import globalStyles from '../../assets/theme/globalStyles';
@@ -11,8 +14,15 @@ import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import OutlinedTextInput from '../../components/OutlinedTextInput';
 import Spacer from '../../components/Spacer';
-import useAuthStore from '../../stores/useAuthStore';
-import { alphaHexColor } from '../../utils';
+import { showTopToast } from '../../components/ToastNotification';
+import {
+  confirmPasswordValidator,
+  emailValidator,
+  nameValidator,
+  passwordValidator,
+} from '../../constants';
+import { firebaseSignUp } from '../../firebase';
+import { alphaHexColor, focusInput } from '../../utils';
 
 const RegisterScreen = ({ navigation }) => {
   const emailInputRef = useRef(null);
@@ -21,24 +31,41 @@ const RegisterScreen = ({ navigation }) => {
   const { bottom } = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const handleLogin = useAuthStore((state) => state.handleLogin);
+
+  const { control, handleSubmit } = useForm(
+    useMemo(
+      () => ({
+        resolver: yupResolver(
+          yup.object().shape({
+            name: nameValidator,
+            email: emailValidator,
+            password: passwordValidator,
+            confirmPassword: confirmPasswordValidator,
+          }),
+        ),
+      }),
+      [],
+    ),
+  );
 
   const changeShowPasswordState = () => setShowPassword(!showPassword);
 
   const changeShowConfirmPasswordState = () =>
     setShowConfirmPassword(!showConfirmPassword);
 
-  const focusEmail = () => emailInputRef.current?.focus();
-
-  const focusPassword = () => passwordInputRef.current?.focus();
-
-  const focusConfirmPassword = () => confirmPasswordInputRef.current?.focus();
-
   const blurConfirmPassword = () => confirmPasswordInputRef.current?.blur();
 
   const goToLogin = () => navigation.navigate('Login');
 
-  const onCreateAccount = () => handleLogin();
+  const onCreateAccount = async ({ name, email, password, confirmPassword }) => {
+    if (!name || !email || !password || password !== confirmPassword) return;
+
+    try {
+      await firebaseSignUp(name, email, password);
+    } catch (error) {
+      showTopToast(error);
+    }
+  };
 
   return (
     <Background keyboardScrollView style={globalStyles.flexFill}>
@@ -49,80 +76,128 @@ const RegisterScreen = ({ navigation }) => {
       <LargeCard style={{ marginBottom: bottom || 32 }}>
         <Text style={styles.formTitle}>Tạo tài khoản</Text>
         <Spacer h={16} />
-        <OutlinedTextInput
-          label="Full Name"
-          returnKeyType="next"
-          onSubmitEditing={focusEmail}
-          errorMessage="Định dạng sai!"
-          CustomView={
-            <Image
-              source={require('../../assets/icons/valid-circle/valid-circle.png')}
-              style={{ position: 'absolute', right: 20 }}
-            />
-          }
-        />
-
-        <OutlinedTextInput
-          ref={emailInputRef}
-          label="Email Address"
-          keyboardType="email-address"
-          returnKeyType="next"
-          onSubmitEditing={focusPassword}
-          errorMessage="Định dạng sai!"
-          CustomView={
-            <Image
-              source={require('../../assets/icons/valid-circle/valid-circle.png')}
-              style={{ position: 'absolute', right: 20 }}
-            />
-          }
-        />
-
-        <OutlinedTextInput
-          ref={passwordInputRef}
-          label="Password"
-          returnKeyType="next"
-          textContentType="oneTimeCode"
-          onSubmitEditing={focusConfirmPassword}
-          errorMessage="Định dạng sai!"
-          secureTextEntry={!showPassword}
-          right={
-            <TextInput.Icon
-              icon={
-                showPassword
-                  ? require('../../assets/icons/eye/eye.png')
-                  : require('../../assets/icons/eye-hidden/eye-hidden.png')
+        <Controller
+          control={control}
+          name="name"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <OutlinedTextInput
+              {...{ onChangeText: onChange, onBlur, value }}
+              label="Full Name"
+              returnKeyType="next"
+              maxLength={255}
+              onSubmitEditing={focusInput(emailInputRef)}
+              errorMessage={error?.message}
+              CustomView={
+                !error?.message && !!value?.length ? (
+                  <Image
+                    source={require('../../assets/icons/valid-circle/valid-circle.png')}
+                    style={{ position: 'absolute', right: 20 }}
+                  />
+                ) : null
               }
-              forceTextInputFocus={false}
-              style={styles.eye}
-              onPress={changeShowPasswordState}
             />
-          }
+          )}
         />
 
-        <OutlinedTextInput
-          ref={confirmPasswordInputRef}
-          label="Confirm Password"
-          onSubmitEditing={blurConfirmPassword}
-          returnKeyType="done"
-          secureTextEntry={!showConfirmPassword}
-          errorMessage="Định dạng sai!"
-          right={
-            <TextInput.Icon
-              icon={
-                showPassword
-                  ? require('../../assets/icons/eye/eye.png')
-                  : require('../../assets/icons/eye-hidden/eye-hidden.png')
+        <Controller
+          control={control}
+          name="email"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <OutlinedTextInput
+              {...{ onChangeText: onChange, onBlur, value }}
+              ref={emailInputRef}
+              label="Email Address"
+              keyboardType="email-address"
+              returnKeyType="next"
+              maxLength={255}
+              onSubmitEditing={focusInput(passwordInputRef)}
+              errorMessage={error?.message}
+              CustomView={
+                !error?.message && !!value?.length ? (
+                  <Image
+                    source={require('../../assets/icons/valid-circle/valid-circle.png')}
+                    style={{ position: 'absolute', right: 20 }}
+                  />
+                ) : null
               }
-              forceTextInputFocus={false}
-              style={styles.eye}
-              onPress={changeShowConfirmPasswordState}
             />
-          }
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="password"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <OutlinedTextInput
+              {...{ onChangeText: onChange, onBlur, value }}
+              errorMessage={error?.message}
+              ref={passwordInputRef}
+              label="Password"
+              returnKeyType="next"
+              textContentType="oneTimeCode"
+              maxLength={16}
+              onSubmitEditing={focusInput(confirmPasswordInputRef)}
+              secureTextEntry={!showPassword}
+              right={
+                <TextInput.Icon
+                  icon={
+                    showPassword
+                      ? require('../../assets/icons/eye/eye.png')
+                      : require('../../assets/icons/eye-hidden/eye-hidden.png')
+                  }
+                  forceTextInputFocus={false}
+                  style={styles.eye}
+                  onPress={changeShowPasswordState}
+                />
+              }
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="confirmPassword"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <OutlinedTextInput
+              {...{ onChangeText: onChange, onBlur, value }}
+              errorMessage={error?.message}
+              ref={confirmPasswordInputRef}
+              label="Confirm Password"
+              maxLength={16}
+              onSubmitEditing={blurConfirmPassword}
+              returnKeyType="done"
+              secureTextEntry={!showConfirmPassword}
+              right={
+                <TextInput.Icon
+                  icon={
+                    showPassword
+                      ? require('../../assets/icons/eye/eye.png')
+                      : require('../../assets/icons/eye-hidden/eye-hidden.png')
+                  }
+                  forceTextInputFocus={false}
+                  style={styles.eye}
+                  onPress={changeShowConfirmPasswordState}
+                />
+              }
+            />
+          )}
         />
 
         <Button
           title="Tạo Tài Khoản"
-          onPress={onCreateAccount}
+          onPress={handleSubmit(onCreateAccount)}
           style={styles.button}
         />
       </LargeCard>

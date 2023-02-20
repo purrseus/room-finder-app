@@ -1,7 +1,10 @@
-import { useRef, useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useMemo, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as yup from 'yup';
 import colors from '../../assets/theme/colors';
 import fonts from '../../assets/theme/fonts';
 import globalStyles from '../../assets/theme/globalStyles';
@@ -11,24 +14,45 @@ import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import OutlinedTextInput from '../../components/OutlinedTextInput';
 import Spacer from '../../components/Spacer';
-import useAuthStore from '../../stores/useAuthStore';
-import { alphaHexColor } from '../../utils';
+import { showTopToast } from '../../components/ToastNotification';
+import { emailValidator, passwordValidator } from '../../constants';
+import { firebaseSignIn } from '../../firebase';
+import { alphaHexColor, focusInput } from '../../utils';
 
 const LoginScreen = ({ navigation }) => {
   const passwordInputRef = useRef(null);
   const { bottom } = useSafeAreaInsets();
   const [showPassword, setShowPassword] = useState(false);
-  const handleLogin = useAuthStore((state) => state.handleLogin);
+
+  const { control, handleSubmit } = useForm(
+    useMemo(
+      () => ({
+        resolver: yupResolver(
+          yup.object().shape({
+            email: emailValidator,
+            password: passwordValidator,
+          }),
+        ),
+      }),
+      [],
+    ),
+  );
 
   const changeShowPasswordState = () => setShowPassword(!showPassword);
-
-  const focusPassword = () => passwordInputRef.current?.focus();
 
   const blurPassword = () => passwordInputRef.current?.blur();
 
   const goToRegister = () => navigation.navigate('Register');
 
-  const onLogin = () => handleLogin();
+  const onLogin = async ({ email, password }) => {
+    if (!email || !password) return;
+
+    try {
+      await firebaseSignIn(email, password);
+    } catch (error) {
+      showTopToast(error);
+    }
+  };
 
   const forgotPassword = () => null;
 
@@ -41,36 +65,62 @@ const LoginScreen = ({ navigation }) => {
       <LargeCard style={{ marginBottom: bottom || 32 }}>
         <Text style={styles.formTitle}>Đăng nhập để tiếp tục</Text>
         <Spacer h={16} />
-        <OutlinedTextInput
-          label="Email Address"
-          keyboardType="email-address"
-          returnKeyType="next"
-          onSubmitEditing={focusPassword}
-          errorMessage="Định dạng sai!"
-        />
-
-        <OutlinedTextInput
-          ref={passwordInputRef}
-          label="Password"
-          returnKeyType="done"
-          onSubmitEditing={blurPassword}
-          secureTextEntry={!showPassword}
-          errorMessage="Định dạng sai!"
-          right={
-            <TextInput.Icon
-              icon={
-                showPassword
-                  ? require('../../assets/icons/eye/eye.png')
-                  : require('../../assets/icons/eye-hidden/eye-hidden.png')
-              }
-              forceTextInputFocus={false}
-              style={styles.eye}
-              onPress={changeShowPasswordState}
+        <Controller
+          control={control}
+          name="email"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <OutlinedTextInput
+              {...{ onChangeText: onChange, onBlur, value }}
+              label="Email Address"
+              keyboardType="email-address"
+              returnKeyType="next"
+              maxLength={255}
+              onSubmitEditing={focusInput(passwordInputRef)}
+              errorMessage={error?.message}
             />
-          }
+          )}
         />
 
-        <Button title="Đăng nhập" onPress={onLogin} style={styles.button} />
+        <Controller
+          control={control}
+          name="password"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <OutlinedTextInput
+              {...{ onChangeText: onChange, onBlur, value }}
+              ref={passwordInputRef}
+              label="Password"
+              returnKeyType="done"
+              maxLength={16}
+              onSubmitEditing={blurPassword}
+              secureTextEntry={!showPassword}
+              errorMessage={error?.message}
+              right={
+                <TextInput.Icon
+                  icon={
+                    showPassword
+                      ? require('../../assets/icons/eye/eye.png')
+                      : require('../../assets/icons/eye-hidden/eye-hidden.png')
+                  }
+                  forceTextInputFocus={false}
+                  style={styles.eye}
+                  onPress={changeShowPasswordState}
+                />
+              }
+            />
+          )}
+        />
+
+        <Button
+          title="Đăng nhập"
+          onPress={handleSubmit(onLogin)}
+          style={styles.button}
+        />
 
         <View style={styles.bottomButton}>
           <View style={{ flexDirection: 'row' }}>

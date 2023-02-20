@@ -9,6 +9,7 @@ const colors = {
   red: '#FF3C3C',
   orange: '#E56C44',
   imageBackground: '#808080',
+  success: '#4CAF50',
 };
 
 export default colors;

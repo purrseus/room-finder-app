@@ -15,14 +15,14 @@ import Background from '../../components/Background';
 import Image from '../../components/Image';
 import LargeTitle from '../../components/LargeTitle';
 import Spacer from '../../components/Spacer';
-import useAuthStore from '../../stores/useAuthStore';
+import { showTopToast } from '../../components/ToastNotification';
+import { firebaseSignOut } from '../../firebase';
 import { alphaHexColor, shadowGenerator } from '../../utils';
 
 const AVATAR_SIZE = 100;
 const BORDER_AVATAR_WIDTH = 4;
 
 const AccountScreen = ({ navigation }) => {
-  const handleLogout = useAuthStore((state) => state.handleLogout);
   const { height } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
   const headerHeight = height * 0.28 + AVATAR_SIZE / 2 - top;
@@ -35,6 +35,14 @@ const AccountScreen = ({ navigation }) => {
   const goToEditProfile = () => navigation.navigate('EditProfile');
 
   const onCallToPhoneNumber = () => Linking.openURL(`tel:${'0931529903'}`);
+
+  const handleLogout = async () => {
+    try {
+      await firebaseSignOut();
+    } catch (error) {
+      showTopToast(error);
+    }
+  };
 
   return (
     <Background topDecorHeight={0.28} style={globalStyles.flexFill}>

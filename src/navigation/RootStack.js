@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { ActivityIndicator, View } from 'react-native';
 import colors from '../assets/theme/colors';
 import globalStyles from '../assets/theme/globalStyles';
+import useFirebaseAuthState from '../hooks/useFirebaseAuthState';
 import CreatePostScreen from '../screens/app/CreatePostScreen';
 import DetailPostScreen from '../screens/app/DetailPostScreen';
 import DetailSearchScreen from '../screens/app/DetailSearchScreen';
@@ -10,7 +11,6 @@ import EditPostScreen from '../screens/app/EditPostScreen';
 import EditProfileScreen from '../screens/app/EditProfileScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
-import useAuthStore from '../stores/useAuthStore';
 import BottomTab from './BottomTab';
 
 const Stack = createNativeStackNavigator();
@@ -37,10 +37,7 @@ const ProtectedScreens = (
 );
 
 const RootStack = () => {
-  const { logged, hasHydrated } = useAuthStore((state) => ({
-    logged: state.logged,
-    hasHydrated: state._hasHydrated,
-  }));
+  const user = useFirebaseAuthState();
 
   const [fontsLoaded] = useFonts({
     'BalooBhaina-Regular': require('../../assets/fonts/BalooBhaina2-Regular.ttf'),
@@ -50,10 +47,10 @@ const RootStack = () => {
     'BalooBhaina-ExtraBold': require('../../assets/fonts/BalooBhaina2-ExtraBold.ttf'),
   });
 
-  if (!hasHydrated || !fontsLoaded) {
+  if (user === undefined || !fontsLoaded) {
     return (
       <View style={globalStyles.flexFillCenter}>
-        <ActivityIndicator color={colors.primary} />
+        <ActivityIndicator color={colors.primary} size="large" />
       </View>
     );
   }
@@ -65,7 +62,7 @@ const RootStack = () => {
         contentStyle: { backgroundColor: colors.white },
       }}
     >
-      {logged ? ProtectedScreens : UnprotectedScreens}
+      {user?.uid ? ProtectedScreens : UnprotectedScreens}
     </Stack.Navigator>
   );
 };
