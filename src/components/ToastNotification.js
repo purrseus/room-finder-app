@@ -31,13 +31,15 @@ const getMessage = (message) => {
 };
 
 export const toastNotificationRef = createRef(null);
-export const showTopToast = (message, isSucceeded = false) =>
+export const showTopToast = (message, isSucceeded = false) => {
+  if (__DEV__) console.log(message);
   toastNotificationRef.current?.show(
     message instanceof FirebaseError
       ? getMessage(message.message)
       : message?.toString() || '',
     isSucceeded,
   );
+};
 
 const SuccessIcon = () => (
   <View style={styles.successIconWrapper}>

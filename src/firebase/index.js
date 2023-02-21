@@ -1,15 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeApp } from 'firebase/app';
 import { initializeAuth } from 'firebase/auth';
-import {
-  createUserWithEmailAndPassword,
-  getReactNativePersistence,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile
-} from 'firebase/auth/react-native';
-import { showTopToast } from '../components/ToastNotification';
+import { getReactNativePersistence } from 'firebase/auth/react-native';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyA51o4EVHE1UDYTYQ7nq8KMaqCN_H5Wx_o',
@@ -27,24 +21,6 @@ export const firebaseAuth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 
-export const firebaseAuthStateChanged = (nextOrObserver) =>
-  onAuthStateChanged(firebaseAuth, nextOrObserver);
+export const firebaseCloudFirestore = getFirestore(app);
 
-export const firebaseSignIn = async (email, password) => {
-  await signInWithEmailAndPassword(firebaseAuth, email, password);
-  showTopToast('Đăng nhập thành công!', true);
-};
-
-export const firebaseSignUp = async (name, email, password) => {
-  const userCredential = await createUserWithEmailAndPassword(
-    firebaseAuth,
-    email,
-    password,
-  );
-  showTopToast('Đăng ký thành công!', true);
-  if (userCredential.user) {
-    await updateProfile(userCredential.user, { displayName: name });
-  }
-};
-
-export const firebaseSignOut = () => signOut(firebaseAuth);
+export const firebaseStorage = getStorage(app);

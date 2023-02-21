@@ -62,7 +62,7 @@ const RootStack = () => {
         contentStyle: { backgroundColor: colors.white },
       }}
     >
-      {user?.uid ? ProtectedScreens : UnprotectedScreens}
+      {user?.id ? ProtectedScreens : UnprotectedScreens}
     </Stack.Navigator>
   );
 };

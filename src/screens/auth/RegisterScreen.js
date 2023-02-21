@@ -21,7 +21,7 @@ import {
   nameValidator,
   passwordValidator,
 } from '../../constants';
-import { firebaseSignUp } from '../../firebase';
+import { firebaseSignUp } from '../../firebase/auth';
 import { alphaHexColor, focusInput } from '../../utils';
 
 const RegisterScreen = ({ navigation }) => {
@@ -61,7 +61,7 @@ const RegisterScreen = ({ navigation }) => {
     if (!name || !email || !password || password !== confirmPassword) return;
 
     try {
-      await firebaseSignUp(name, email, password);
+      await firebaseSignUp(name, email.toLowerCase(), password);
     } catch (error) {
       showTopToast(error);
     }
@@ -87,7 +87,6 @@ const RegisterScreen = ({ navigation }) => {
               {...{ onChangeText: onChange, onBlur, value }}
               label="Full Name"
               returnKeyType="next"
-              maxLength={255}
               onSubmitEditing={focusInput(emailInputRef)}
               errorMessage={error?.message}
               CustomView={
@@ -114,8 +113,8 @@ const RegisterScreen = ({ navigation }) => {
               ref={emailInputRef}
               label="Email Address"
               keyboardType="email-address"
-              returnKeyType="next"
-              maxLength={255}
+                autoCapitalize="none"
+                returnKeyType="next"
               onSubmitEditing={focusInput(passwordInputRef)}
               errorMessage={error?.message}
               CustomView={

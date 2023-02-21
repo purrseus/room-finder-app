@@ -16,7 +16,7 @@ import OutlinedTextInput from '../../components/OutlinedTextInput';
 import Spacer from '../../components/Spacer';
 import { showTopToast } from '../../components/ToastNotification';
 import { emailValidator, passwordValidator } from '../../constants';
-import { firebaseSignIn } from '../../firebase';
+import { firebaseSignIn } from '../../firebase/auth';
 import { alphaHexColor, focusInput } from '../../utils';
 
 const LoginScreen = ({ navigation }) => {
@@ -48,7 +48,7 @@ const LoginScreen = ({ navigation }) => {
     if (!email || !password) return;
 
     try {
-      await firebaseSignIn(email, password);
+      await firebaseSignIn(email.toLowerCase(), password);
     } catch (error) {
       showTopToast(error);
     }
@@ -76,8 +76,8 @@ const LoginScreen = ({ navigation }) => {
               {...{ onChangeText: onChange, onBlur, value }}
               label="Email Address"
               keyboardType="email-address"
-              returnKeyType="next"
-              maxLength={255}
+                autoCapitalize="none"
+                returnKeyType="next"
               onSubmitEditing={focusInput(passwordInputRef)}
               errorMessage={error?.message}
             />

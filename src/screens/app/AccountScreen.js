@@ -1,3 +1,4 @@
+import { launchImageLibraryAsync } from 'expo-image-picker';
 import {
   Image as RNImage,
   Linking,
@@ -16,7 +17,9 @@ import Image from '../../components/Image';
 import LargeTitle from '../../components/LargeTitle';
 import Spacer from '../../components/Spacer';
 import { showTopToast } from '../../components/ToastNotification';
-import { firebaseSignOut } from '../../firebase';
+import { firebaseSignOut } from '../../firebase/auth';
+import { updateAvatar } from '../../firebase/storage';
+import useFirebaseAuthState from '../../hooks/useFirebaseAuthState';
 import { alphaHexColor, shadowGenerator } from '../../utils';
 
 const AVATAR_SIZE = 100;
@@ -26,15 +29,29 @@ const AccountScreen = ({ navigation }) => {
   const { height } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
   const headerHeight = height * 0.28 + AVATAR_SIZE / 2 - top;
-
-  const avatar =
-    Math.random() < 0.5
-      ? { uri: 'https://picsum.photos/100/100' }
-      : require('../../assets/images/default-avatar.jpg');
+  const user = useFirebaseAuthState();
 
   const goToEditProfile = () => navigation.navigate('EditProfile');
 
-  const onCallToPhoneNumber = () => Linking.openURL(`tel:${'0931529903'}`);
+  const onCallToPhoneNumber = () => {
+    if (user?.phoneNumber) Linking.openURL(`tel:${user?.phoneNumber}`);
+  };
+
+  const onChangeAvatar = async () => {
+    try {
+      const pickerResult = await launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        mediaTypes: 'Images',
+      });
+
+      if (pickerResult.assets[0].uri) {
+        await updateAvatar(user, pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      showTopToast(error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -49,11 +66,18 @@ const AccountScreen = ({ navigation }) => {
       <View style={[styles.headerContainer, { height: headerHeight }]}>
         <LargeTitle style={styles.largeTitle}>Tài Khoản</LargeTitle>
         <View>
-          <Image source={avatar} style={styles.avatar} />
+          <Image
+            source={
+              user?.id
+                ? { imageStorage: user?.avatar }
+                : require('../../assets/images/default-avatar.jpg')
+            }
+            style={styles.avatar}
+          />
 
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => null}
+            onPress={onChangeAvatar}
             style={styles.editAvatarButton}
           >
             <RNImage source={require('../../assets/icons/plus/plus.png')} />
@@ -62,8 +86,8 @@ const AccountScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.body}>
-        <LargeTitle style={styles.username}>Nguyễn Văn A</LargeTitle>
-        <Text style={styles.address}>Việt Yên, Bắc Giang</Text>
+        <LargeTitle style={styles.username}>{user?.name}</LargeTitle>
+        {!!user?.address && <Text style={styles.address}>{user.address}</Text>}
         <ScrollView>
           <TouchableOpacity
             style={styles.callButton}
@@ -78,21 +102,21 @@ const AccountScreen = ({ navigation }) => {
             <View style={styles.infoItem}>
               <Text style={styles.infoTitle}>Email</Text>
               <Text style={styles.infoContent} numberOfLines={1}>
-                asdhenry11@gmail.com
+                {user?.email}
               </Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.infoItem}>
               <Text style={styles.infoTitle}>Địa chỉ</Text>
               <Text style={styles.infoContent} numberOfLines={1}>
-                Việt Yên, Bắc Giang
+                {user?.address}
               </Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.infoItem}>
               <Text style={styles.infoTitle}>Số điện thoại</Text>
               <Text style={styles.infoContent} numberOfLines={1}>
-                (+977) 9125331510
+                {user?.phoneNumber}
               </Text>
             </View>
           </View>

@@ -22,6 +22,7 @@ const OutlinedTextInput = forwardRef(
               !!props.multiline && { height: 100 },
             ]}
             style={styles.input}
+            maxLength={255}
             {...props}
           />
           {CustomView}
