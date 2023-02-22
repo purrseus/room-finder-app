@@ -8,11 +8,7 @@ const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g;
 const PASSWORD_REGEX = /^[A-Za-z0-9]{8,16}$/g;
 const PHONE_NUMBER_REGEX = /^\d{8,16}$/g;
-
-export const UserStatus = {
-  Active: 1,
-  Inactive: 2,
-};
+const PRICE_REGEX = /^\d+$/g;
 
 export const nameValidator = yup
   .string()
@@ -40,7 +36,7 @@ export const confirmPasswordValidator = yup
 export const addressValidator = yup
   .string()
   .notRequired()
-  .min(4, INVALID_FORMAT)
+  .min(1, INVALID_FORMAT)
   .trim(INVALID_SPACES)
   .transform((value) => value || null);
 
@@ -50,3 +46,29 @@ export const phoneNumberValidator = yup
   .matches(PHONE_NUMBER_REGEX, INVALID_FORMAT)
   .trim(INVALID_SPACES)
   .transform((value) => value || null);
+
+export const titleValidator = nameValidator;
+
+export const priceValidator = yup
+  .string()
+  .matches(PRICE_REGEX, INVALID_FORMAT)
+  .required(REQUIRED_FIELD)
+  .trim(INVALID_SPACES);
+
+export const addressRoomValidator = yup
+  .string()
+  .required(REQUIRED_FIELD)
+  .min(1, INVALID_FORMAT)
+  .trim(INVALID_SPACES);
+
+export const areaValidator = yup
+  .string()
+  .notRequired()
+  .matches(PRICE_REGEX, INVALID_FORMAT)
+  .trim(INVALID_SPACES);
+
+export const descriptionValidator = yup
+  .string()
+  .notRequired()
+  .min(1, INVALID_FORMAT)
+  .trim(INVALID_SPACES);

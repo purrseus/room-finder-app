@@ -12,6 +12,7 @@ import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../assets/theme/colors';
 import { alphaHexColor, shadowGenerator } from '../utils';
+import { showOverlayLoading } from './OverlayLoading';
 import Spacer from './Spacer';
 
 const EMAIL_ALREADY_IN_USE = 'auth/email-already-in-use';
@@ -33,6 +34,7 @@ const getMessage = (message) => {
 export const toastNotificationRef = createRef(null);
 export const showTopToast = (message, isSucceeded = false) => {
   if (__DEV__) console.log(message);
+  showOverlayLoading(false);
   toastNotificationRef.current?.show(
     message instanceof FirebaseError
       ? getMessage(message.message)

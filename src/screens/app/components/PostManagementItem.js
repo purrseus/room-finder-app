@@ -3,13 +3,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '../../../assets/theme/colors';
 import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
-import { alphaHexColor, shadowGenerator } from '../../../utils';
+import { alphaHexColor, formatCurrency, shadowGenerator } from '../../../utils';
 
-const PostManagementItem = () => {
+const PostManagementItem = ({ item }) => {
   const navigation = useNavigation();
 
   const onEditPost = () => {
-    navigation.navigate('EditPost');
+    navigation.navigate('EditPost', { defaultValues: item });
   };
 
   return (
@@ -20,24 +20,24 @@ const PostManagementItem = () => {
     >
       <Image
         style={styles.image}
-        source={{ uri: 'https://picsum.photos/100/100' }}
+        source={{ imageStorage: item?.photo }}
       />
       <Spacer w={14} />
       <View style={styles.contentContainer}>
         <View>
           <View style={styles.priceWrapper}>
-            <Text style={styles.price}>800.000đ</Text>
+            <Text style={styles.price}>{formatCurrency(item?.price)}</Text>
           </View>
           <Text style={styles.name} numberOfLines={1}>
-            Phòng trọ tự quản, có nóng lạnh
+            {item?.title}
           </Text>
-          <Text style={styles.address}>Lương Ngọc Quyến, Thái Nguyên</Text>
+          <Text style={styles.address}>{item?.address}</Text>
         </View>
 
         <View style={styles.statusWrapper}>
-          <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+          <View style={[styles.dot, { backgroundColor: !item?.approved ? colors.orange : colors.primary }]} />
           <Spacer w={6} />
-          <Text style={styles.statusText}>Đã đăng</Text>
+          <Text style={styles.statusText}>{item?.approved ? 'Đã đăng' : 'Chưa duyệt'}</Text>
         </View>
       </View>
     </TouchableOpacity>

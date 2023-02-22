@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform, UIManager } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import OverlayLoading, { overlayLoadingRef } from './src/components/OverlayLoading';
 import ToastNotification, { toastNotificationRef } from './src/components/ToastNotification';
 import RootStack from './src/navigation/RootStack';
 
@@ -20,6 +21,7 @@ export default function App() {
           <StatusBar style="light" />
           <ToastNotification ref={toastNotificationRef} />
           <RootStack />
+          <OverlayLoading ref={overlayLoadingRef} />
         </NavigationContainer>
       </PaperProvider>
     </SafeAreaProvider>

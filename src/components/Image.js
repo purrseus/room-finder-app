@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Image as RNImage, LayoutAnimation } from 'react-native';
 import colors from '../assets/theme/colors';
 import { firebaseStorage } from '../firebase';
-import { showTopToast } from './ToastNotification';
+import { alphaHexColor } from '../utils';
 
 const Image = ({ style, source, ...props }) => {
   const [image, setImage] = useState(source);
@@ -18,7 +18,7 @@ const Image = ({ style, source, ...props }) => {
           LayoutAnimation.easeInEaseOut();
           setImage({ uri: url });
         } catch (error) {
-          showTopToast(error);
+          console.log(error);
         }
       })();
     }
@@ -29,7 +29,7 @@ const Image = ({ style, source, ...props }) => {
       {...props}
       source={image}
       progressiveRenderingEnabled
-      style={[{ backgroundColor: colors.white }, style]}
+      style={[{ backgroundColor: alphaHexColor(colors.primary, 0.2) }, style]}
     />
   );
 };

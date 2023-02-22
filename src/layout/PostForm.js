@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useMemo, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
-  Image,
   Image as RNImage,
   StyleSheet,
   Text,
@@ -17,21 +18,33 @@ import KeyboardAwareScrollView from '../components/KeyboardAwareScrollView';
 import LargeCard from '../components/LargeCard';
 import OutlinedTextInput from '../components/OutlinedTextInput';
 import Spacer from '../components/Spacer';
-import { alphaHexColor } from '../utils';
+import { alphaHexColor, focusInput } from '../utils';
+import * as yup from 'yup';
+import {
+  areaValidator,
+  addressRoomValidator,
+  descriptionValidator,
+  nameValidator,
+  priceValidator,
+} from '../constants';
+import { showTopToast } from '../components/ToastNotification';
+import { launchImageLibraryAsync } from 'expo-image-picker';
+import useFirebaseAuthState from '../hooks/useFirebaseAuthState';
+import Image from '../components/Image';
 
-const RadioButton = ({ label, isChecked, setIsChecked }) => {
+const RadioButton = ({ label, value, currentValue, setIsChecked }) => {
   return (
     <View style={styles.checkboxContainer}>
       <TouchableOpacity
         hitSlop={4}
         activeOpacity={1}
-        onPress={!isChecked ? () => setIsChecked((prev) => !prev) : undefined}
+        onPress={() => setIsChecked(value)}
         style={styles.radioButton}
       >
         <View
           style={[
             styles.innerRadioButton,
-            !isChecked && { backgroundColor: 'transparent' },
+            currentValue !== value && { backgroundColor: 'transparent' },
           ]}
         />
       </TouchableOpacity>
@@ -47,10 +60,10 @@ const Checkbox = ({ label, isChecked, setIsChecked }) => {
       <TouchableOpacity
         hitSlop={4}
         activeOpacity={1}
-        onPress={() => setIsChecked((prev) => !prev)}
+        onPress={() => setIsChecked(!isChecked)}
         style={styles.checkboxButton}
       >
-        <Image
+        <RNImage
           source={require('../assets/icons/check/check.png')}
           style={[styles.checkIcon, !isChecked && { opacity: 0 }]}
         />
@@ -70,31 +83,89 @@ const Field = ({ children, label = '', style }) => {
   );
 };
 
-const PostForm = ({ navigation, title, handleButtonPress }) => {
-  const { height } = useWindowDimensions();
+const PostForm = ({
+  navigation,
+  title,
+  defaultValues = {},
+  handleButtonPress,
+}) => {
+  const { height, width } = useWindowDimensions();
   const { top, bottom } = useSafeAreaInsets();
+  const user = useFirebaseAuthState();
 
-  const [hasWaterHeater, setHasWaterHeater] = useState(false);
-  const [hasAirCondition, setHasAirCondition] = useState(false);
-  const [hasWifi, setHasWifi] = useState(false);
-  const [hasParking, setHasParking] = useState(false);
-  const [hasFridge, setHasFridge] = useState(false);
-  const [hasTV, setHasTV] = useState(false);
-
-  const [isRoomAvailable, setIsRoomAvailable] = useState(true);
+  const [postInfo, setPostInfo] = useState({
+    hasWaterHeater: defaultValues?.hasWaterHeater || false,
+    hasAirCondition: defaultValues?.hasAirCondition || false,
+    hasWifi: defaultValues?.hasWifi || false,
+    hasParking: defaultValues?.hasParking || false,
+    hasFridge: defaultValues?.hasFridge || false,
+    hasTV: defaultValues?.hasTV || false,
+    photo: defaultValues?.photo || null,
+    isOutOfRoom: defaultValues?.isOutOfRoom || false,
+  });
 
   const priceRef = useRef(null);
-  const acreageRef = useRef(null);
+  const areaRef = useRef(null);
   const addressRef = useRef(null);
   const descriptionRef = useRef(null);
 
-  const focusPrice = () => priceRef.current?.focus();
+  const changeState = (key) => (value) =>
+    setPostInfo((prevState) => ({ ...prevState, [key]: value }));
 
-  const focusAcreage = () => acreageRef.current?.focus();
+  const removePhoto = () => changeState('photo')(null);
 
-  const focusAddress = () => addressRef.current?.focus();
+  const blurDescription = () => descriptionRef.current?.blur();
 
-  const focusDescription = () => descriptionRef.current?.focus();
+  const fefaultFormValues = {
+    title: defaultValues?.title || '',
+    price: defaultValues?.price || '',
+    address: defaultValues?.address || '',
+    area: defaultValues?.area || '',
+    description: defaultValues?.description || '',
+  };
+
+  const { control, handleSubmit } = useForm(
+    useMemo(
+      () => ({
+        values: fefaultFormValues,
+        resolver: yupResolver(
+          yup.object().shape({
+            title: nameValidator,
+            price: priceValidator,
+            address: addressRoomValidator,
+            area: areaValidator,
+            description: descriptionValidator,
+          }),
+        ),
+      }),
+      [defaultValues],
+    ),
+  );
+
+  const getPreviewPhoto = async () => {
+    try {
+      const pickerResult = await launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+        mediaTypes: 'Images',
+      });
+
+      if (pickerResult?.assets?.[0]?.uri) {
+        changeState('photo')(pickerResult?.assets?.[0]?.uri);
+      }
+    } catch (error) {
+      showTopToast(error);
+    }
+  };
+
+  const onSubmit = (values) => {
+    handleButtonPress({
+      ...values,
+      ...postInfo,
+      userId: user?.id,
+    });
+  };
 
   return (
     <Background topDecorHeight={0.15} style={globalStyles.flexFill}>
@@ -127,101 +198,186 @@ const PostForm = ({ navigation, title, handleButtonPress }) => {
         style={[styles.body, { marginTop: height * 0.15 - top }]}
       >
         <LargeCard style={{ marginTop: 16, marginBottom: bottom || 32 }}>
-          <OutlinedTextInput
-            label="Tiêu đề"
-            returnKeyType="next"
-            onSubmitEditing={focusPrice}
-            errorMessage="Định dạng sai!"
+          <Controller
+            control={control}
+            name="title"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <OutlinedTextInput
+                {...{ onChangeText: onChange, onBlur, value }}
+                errorMessage={error?.message}
+                label="Tiêu đề"
+                returnKeyType="next"
+                onSubmitEditing={focusInput(priceRef)}
+              />
+            )}
           />
 
-          <OutlinedTextInput
-            ref={priceRef}
-            label="Giá phòng/tháng"
-            returnKeyType="next"
-            keyboardType="number-pad"
-            onSubmitEditing={focusAcreage}
-            errorMessage="Định dạng sai!"
+          <Controller
+            control={control}
+            name="price"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <OutlinedTextInput
+                {...{ onChangeText: onChange, onBlur, value }}
+                errorMessage={error?.message}
+                ref={priceRef}
+                label="Giá phòng/tháng"
+                returnKeyType="next"
+                keyboardType="number-pad"
+                onSubmitEditing={focusInput(areaRef)}
+              />
+            )}
           />
 
-          <OutlinedTextInput
-            ref={acreageRef}
-            label="Diện tích (m2)"
-            returnKeyType="next"
-            keyboardType="number-pad"
-            onSubmitEditing={focusAddress}
-            errorMessage="Định dạng sai!"
+          <Controller
+            control={control}
+            name="address"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <OutlinedTextInput
+                {...{ onChangeText: onChange, onBlur, value }}
+                errorMessage={error?.message}
+                ref={addressRef}
+                label="Địa chỉ"
+                returnKeyType="next"
+                textContentType="fullStreetAddress"
+                onSubmitEditing={focusInput(descriptionRef)}
+              />
+            )}
           />
 
-          <OutlinedTextInput
-            ref={addressRef}
-            label="Địa chỉ"
-            returnKeyType="next"
-            textContentType="fullStreetAddress"
-            onSubmitEditing={focusDescription}
-            errorMessage="Định dạng sai!"
+          <Controller
+            control={control}
+            name="area"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <OutlinedTextInput
+                {...{ onChangeText: onChange, onBlur, value }}
+                errorMessage={error?.message}
+                ref={areaRef} // TODO: format currency input
+                label="Diện tích (m2)"
+                returnKeyType="next"
+                keyboardType="number-pad"
+                onSubmitEditing={focusInput(addressRef)}
+              />
+            )}
           />
 
-          <OutlinedTextInput
-            ref={descriptionRef}
-            label="Mô tả"
-            returnKeyType="next"
-            multiline
-            onSubmitEditing={focusDescription}
-            errorMessage="Định dạng sai!"
+          <Controller
+            control={control}
+            name="description"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <OutlinedTextInput
+                {...{ onChangeText: onChange, onBlur, value }}
+                errorMessage={error?.message}
+                maxLength={1000}
+                ref={descriptionRef}
+                label="Mô tả"
+                returnKeyType="next"
+                multiline
+                onSubmitEditing={blurDescription}
+              />
+            )}
           />
 
           <Field label="Tiện ích" style={styles.utilitiesField}>
             <Checkbox
-              isChecked={hasWaterHeater}
-              setIsChecked={setHasWaterHeater}
+              isChecked={postInfo.hasWaterHeater}
+              setIsChecked={changeState('hasWaterHeater')}
               label="Nóng lạnh"
             />
             <Checkbox
-              isChecked={hasAirCondition}
-              setIsChecked={setHasAirCondition}
+              isChecked={postInfo.hasAirCondition}
+              setIsChecked={changeState('hasAirCondition')}
               label="Điều hoà"
             />
             <Checkbox
-              isChecked={hasWifi}
-              setIsChecked={setHasWifi}
+              isChecked={postInfo.hasWifi}
+              setIsChecked={changeState('hasWifi')}
               label="Wifi"
             />
             <Checkbox
-              isChecked={hasParking}
-              setIsChecked={setHasParking}
+              isChecked={postInfo.hasParking}
+              setIsChecked={changeState('hasParking')}
               label="Chỗ để xe"
             />
             <Checkbox
-              isChecked={hasFridge}
-              setIsChecked={setHasFridge}
+              isChecked={postInfo.hasFridge}
+              setIsChecked={changeState('hasFridge')}
               label="Tủ lạnh"
             />
-            <Checkbox isChecked={hasTV} setIsChecked={setHasTV} label="Tivi" />
+            <Checkbox
+              isChecked={postInfo.hasTV}
+              setIsChecked={changeState('hasTV')}
+              label="Tivi"
+            />
           </Field>
 
-          <Field label="Hình ảnh">
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => null}
-              style={styles.photoLabel}
-            >
-              <Image source={require('../assets/icons/photo/photo.png')} />
-              <Text style={styles.photoDescription}>
-                Nhấn vào để tải lên hình ảnh
-              </Text>
-            </TouchableOpacity>
+          <Field label={postInfo.photo ? '' : 'Hình ảnh'}>
+            {!!postInfo.photo && (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={removePhoto}
+                style={styles.removeImageButton}
+              >
+                <RNImage
+                  source={require('../assets/icons/plus/plus.png')}
+                  style={styles.removeIcon}
+                />
+              </TouchableOpacity>
+            )}
+            {postInfo.photo ? (
+              <Image
+                source={
+                  defaultValues?.photo && !postInfo.photo?.startsWith('file')
+                    ? { imageStorage: postInfo.photo }
+                    : { uri: postInfo.photo }
+                }
+                resizeMode="cover"
+                style={{
+                  width: width - 30 * 4,
+                  height: width - 30 * 4,
+                  borderRadius: 4,
+                }}
+              />
+            ) : (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={getPreviewPhoto}
+                style={styles.photoWrapper}
+              >
+                <Image source={require('../assets/icons/photo/photo.png')} />
+                <Text style={styles.photoDescription}>
+                  Nhấn vào để tải lên hình ảnh
+                </Text>
+              </TouchableOpacity>
+            )}
           </Field>
 
           <View style={styles.radioContainer}>
             <RadioButton
               label="Còn phòng"
-              isChecked={isRoomAvailable}
-              setIsChecked={setIsRoomAvailable}
+              value={false}
+              currentValue={postInfo.isOutOfRoom}
+              setIsChecked={changeState('isOutOfRoom')}
             />
             <RadioButton
-              label="Hết phòng "
-              isChecked={!isRoomAvailable}
-              setIsChecked={setIsRoomAvailable}
+              label="Hết phòng"
+              value={true}
+              currentValue={postInfo.isOutOfRoom}
+              setIsChecked={changeState('isOutOfRoom')}
             />
           </View>
 
@@ -229,7 +385,7 @@ const PostForm = ({ navigation, title, handleButtonPress }) => {
 
           <Button
             title="Đăng Bài"
-            onPress={handleButtonPress}
+            onPress={handleSubmit(onSubmit)}
             style={styles.button}
           />
         </LargeCard>
@@ -316,7 +472,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryText,
     marginLeft: 4,
   },
-  photoLabel: {
+  photoWrapper: {
     paddingVertical: 24,
     alignItems: 'center',
   },
@@ -343,6 +499,26 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 12,
     marginHorizontal: 34,
+  },
+  removeImageButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    zIndex: 10,
+  },
+  removeIcon: {
+    tintColor: colors.primary,
+    width: 10,
+    height: 10,
+    transform: [{ rotate: '45deg' }],
   },
 });
 

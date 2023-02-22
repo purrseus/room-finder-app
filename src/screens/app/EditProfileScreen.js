@@ -27,6 +27,7 @@ import { focusInput } from '../../utils';
 import useFirebaseAuthState from '../../hooks/useFirebaseAuthState';
 import { firebaseUpdateUser } from '../../firebase/auth';
 import { showTopToast } from '../../components/ToastNotification';
+import { showOverlayLoading } from '../../components/OverlayLoading';
 
 const EditProfileScreen = ({ navigation }) => {
   const addressInputRef = useRef(null);
@@ -58,6 +59,8 @@ const EditProfileScreen = ({ navigation }) => {
   const blurPhoneNumber = () => phoneNumberInputRef.current?.blur();
 
   const onSave = async ({ email, address, phoneNumber }) => {
+    showOverlayLoading(true);
+
     try {
       await firebaseUpdateUser(user?.id, {
         ...user,
@@ -68,6 +71,8 @@ const EditProfileScreen = ({ navigation }) => {
       navigation.goBack();
     } catch (error) {
       showTopToast(error);
+    } finally {
+      showOverlayLoading(false);
     }
   };
 

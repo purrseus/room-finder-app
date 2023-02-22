@@ -14,6 +14,7 @@ import {
   createUser,
   updateUser,
 } from './cloudFirestore';
+import { uploadImage } from './storage';
 
 export const firebaseAuthStateChanged = (nextOrObserver) =>
   onAuthStateChanged(firebaseAuth, nextOrObserver);
@@ -51,4 +52,9 @@ export const firebaseUpdateUser = async (id, { email, address, phoneNumber, avat
 
   await updateUser(id, { email, address, phoneNumber, avatar });
   showTopToast('Cập nhật thông tin thành công!', true);
+};
+
+export const updateAvatar = async (user, uri) => {
+  const path = await uploadImage(user?.id, uri);
+  await firebaseUpdateUser(user?.id, { ...user, avatar: path });
 };

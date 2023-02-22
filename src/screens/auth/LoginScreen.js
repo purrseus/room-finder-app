@@ -13,6 +13,7 @@ import Button from '../../components/Button';
 import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import OutlinedTextInput from '../../components/OutlinedTextInput';
+import { showOverlayLoading } from '../../components/OverlayLoading';
 import Spacer from '../../components/Spacer';
 import { showTopToast } from '../../components/ToastNotification';
 import { emailValidator, passwordValidator } from '../../constants';
@@ -47,10 +48,13 @@ const LoginScreen = ({ navigation }) => {
   const onLogin = async ({ email, password }) => {
     if (!email || !password) return;
 
+    showOverlayLoading(true);
     try {
       await firebaseSignIn(email.toLowerCase(), password);
     } catch (error) {
       showTopToast(error);
+    } finally {
+      showOverlayLoading(false);
     }
   };
 

@@ -1,11 +1,19 @@
-import colors from "../assets/theme/colors";
+import numeral from 'numeral';
+import colors from '../assets/theme/colors';
+import 'numeral/locales/vi';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+
+numeral.locale('vi');
+dayjs.locale('vi');
 
 const MAX_DEPTH = 24;
 const MIN_SHADOW_OPACITY = 0.2;
 const MAX_SHADOW_OPACITY = 0.6;
 const MAX_SHADOW_RADIUS = 16;
 
-const SHADOW_OPACITY_PER_DEPTH = (MAX_SHADOW_OPACITY * 100 - MIN_SHADOW_OPACITY * 100) / MAX_DEPTH;
+const SHADOW_OPACITY_PER_DEPTH =
+  (MAX_SHADOW_OPACITY * 100 - MIN_SHADOW_OPACITY * 100) / MAX_DEPTH;
 const SHADOW_RADIUS_PER_DEPTH = MAX_SHADOW_RADIUS / MAX_DEPTH;
 
 export const shadowGenerator = (depth, shadowColor = colors.black) => ({
@@ -15,7 +23,9 @@ export const shadowGenerator = (depth, shadowColor = colors.black) => ({
     height: depth ? Math.floor(depth / 2) : 0,
   },
   shadowOpacity:
-    Math.ceil((depth ? MIN_SHADOW_OPACITY : 0) * 100 + SHADOW_OPACITY_PER_DEPTH * depth) / 100,
+    Math.ceil(
+      (depth ? MIN_SHADOW_OPACITY : 0) * 100 + SHADOW_OPACITY_PER_DEPTH * depth,
+    ) / 100,
   shadowRadius: SHADOW_RADIUS_PER_DEPTH * depth,
   elevation: depth,
 });
@@ -32,3 +42,7 @@ export const alphaHexColor = (hexColor, opacity) => {
 };
 
 export const focusInput = (ref) => () => ref.current?.focus();
+
+export const formatCurrency = (value) => numeral(value).format('0,0 $');
+
+export const formatDate = (value) => dayjs(value).format('DD/MM/YYYY');

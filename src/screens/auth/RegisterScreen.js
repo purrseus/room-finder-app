@@ -57,13 +57,21 @@ const RegisterScreen = ({ navigation }) => {
 
   const goToLogin = () => navigation.navigate('Login');
 
-  const onCreateAccount = async ({ name, email, password, confirmPassword }) => {
+  const onCreateAccount = async ({
+    name,
+    email,
+    password,
+    confirmPassword,
+  }) => {
     if (!name || !email || !password || password !== confirmPassword) return;
 
+    showOverlayLoading(true);
     try {
       await firebaseSignUp(name, email.toLowerCase(), password);
     } catch (error) {
       showTopToast(error);
+    } finally {
+      showOverlayLoading(false);
     }
   };
 
@@ -113,8 +121,8 @@ const RegisterScreen = ({ navigation }) => {
               ref={emailInputRef}
               label="Email Address"
               keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
+              autoCapitalize="none"
+              returnKeyType="next"
               onSubmitEditing={focusInput(passwordInputRef)}
               errorMessage={error?.message}
               CustomView={

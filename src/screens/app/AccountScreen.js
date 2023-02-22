@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View,
+  View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
@@ -15,10 +15,10 @@ import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
 import Image from '../../components/Image';
 import LargeTitle from '../../components/LargeTitle';
+import { showOverlayLoading } from '../../components/OverlayLoading';
 import Spacer from '../../components/Spacer';
 import { showTopToast } from '../../components/ToastNotification';
-import { firebaseSignOut } from '../../firebase/auth';
-import { updateAvatar } from '../../firebase/storage';
+import { firebaseSignOut, updateAvatar } from '../../firebase/auth';
 import useFirebaseAuthState from '../../hooks/useFirebaseAuthState';
 import { alphaHexColor, shadowGenerator } from '../../utils';
 
@@ -42,22 +42,29 @@ const AccountScreen = ({ navigation }) => {
       const pickerResult = await launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [1, 1],
+        quality: 1,
         mediaTypes: 'Images',
       });
+      showOverlayLoading(true);
 
-      if (pickerResult.assets[0].uri) {
+      if (pickerResult?.assets?.[0]?.uri) {
         await updateAvatar(user, pickerResult.assets[0].uri);
       }
     } catch (error) {
       showTopToast(error);
+    } finally {
+      showOverlayLoading(false);
     }
   };
 
   const handleLogout = async () => {
     try {
+      showOverlayLoading(true);
       await firebaseSignOut();
     } catch (error) {
       showTopToast(error);
+    } finally {
+      showOverlayLoading(false);
     }
   };
 
@@ -68,7 +75,7 @@ const AccountScreen = ({ navigation }) => {
         <View>
           <Image
             source={
-              user?.id
+              user?.avatar
                 ? { imageStorage: user?.avatar }
                 : require('../../assets/images/default-avatar.jpg')
             }

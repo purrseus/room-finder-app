@@ -1,5 +1,5 @@
 import { useScrollToTop } from '@react-navigation/native';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -7,27 +7,46 @@ import {
   Text,
   TouchableOpacity,
   useWindowDimensions,
-  View
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
 import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
+import { myPostsSnapshot } from '../../firebase/cloudFirestore';
+import useFirebaseAuthState from '../../hooks/useFirebaseAuthState';
 import { alphaHexColor, shadowGenerator } from '../../utils';
 import PostManagementItem from './components/PostManagementItem';
 
 const PostManagementScreen = ({ navigation }) => {
   const { height } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
+  const user = useFirebaseAuthState();
+  const [posts, setPosts] = useState([]);
 
   const scrollRef = useRef(null);
 
   useScrollToTop(scrollRef);
 
+  useEffect(() => {
+    let unsubscribe;
+    if (user?.id) {
+      unsubscribe = myPostsSnapshot(user.id, (documentSnapshot) => {
+        const tempPosts = [];
+        documentSnapshot.forEach((doc) => {
+          tempPosts.push({ ...doc.data(), id: doc.id });
+        });
+        setPosts(tempPosts);
+      });
+    }
+
+    return () => unsubscribe?.();
+  }, [user]);
+
   const onCreatePost = () => navigation.navigate('CreatePost');
 
-  const renderItem = useCallback(({ item, index }) => {
-    return <PostManagementItem />;
+  const renderItem = useCallback(({ item }) => {
+    return <PostManagementItem item={item} />;
   }, []);
 
   return (
@@ -37,7 +56,7 @@ const PostManagementScreen = ({ navigation }) => {
       <View style={[styles.body, { marginTop: height * 0.15 - top }]}>
         <View style={styles.row}>
           <View style={styles.totalPostWrapper}>
-            <Text style={styles.totalPostText}>Bài đăng (4)</Text>
+            <Text style={styles.totalPostText}>Bài đăng ({posts.length})</Text>
           </View>
 
           <TouchableOpacity
@@ -49,11 +68,7 @@ const PostManagementScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <FlatList
-          ref={scrollRef}
-          data={Array.from({ length: 60 }, (_, i) => i)}
-          renderItem={renderItem}
-        />
+        <FlatList ref={scrollRef} data={posts} renderItem={renderItem} />
       </View>
     </Background>
   );
