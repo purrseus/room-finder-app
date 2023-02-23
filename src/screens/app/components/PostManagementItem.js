@@ -25,8 +25,8 @@ const PostManagementItem = ({ item }) => {
       <Spacer w={14} />
       <View style={styles.contentContainer}>
         <View>
-          <View style={styles.priceWrapper}>
-            <Text style={styles.price}>{formatCurrency(item?.price)}</Text>
+          <View style={styles.roomRateWrapper}>
+            <Text style={styles.roomRate}>{formatCurrency(item?.roomRate)}</Text>
           </View>
           <Text style={styles.name} numberOfLines={1}>
             {item?.title}
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     color: alphaHexColor(colors.black, 0.6),
     flexShrink: 1,
   },
-  priceWrapper: {
+  roomRateWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.primary,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 4,
   },
-  price: {
+  roomRate: {
     fontSize: 10,
     fontWeight: 'bold',
     color: colors.white,

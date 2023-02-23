@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Image as RNImage,
@@ -7,18 +7,38 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '../../assets/theme/colors';
+import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
 import IconTextInput from '../../components/IconTextInput';
 import LargeCard from '../../components/LargeCard';
 import Spacer from '../../components/Spacer';
-import { alphaHexColor } from '../../utils';
+import { postsSnapshot } from '../../firebase/cloudFirestore';
+import { alphaHexColor, formatTextToSearch } from '../../utils';
 import SearchItem from './components/SearchItem';
-import globalStyles from '../../assets/theme/globalStyles';
 
 const DetailSearchScreen = ({ route: { params }, navigation }) => {
-  const { top, bottom } = useSafeAreaInsets();
+  const [posts, setPosts] = useState([]);
+
+  const resultList = useMemo(() => {
+    return posts.filter((post) =>
+      formatTextToSearch(post?.address).includes(
+        formatTextToSearch(params?.searchText),
+      ),
+    );
+  }, [posts]);
+
+  useEffect(() => {
+    const unsubscribe = postsSnapshot((documentSnapshot) => {
+      const tempPosts = [];
+      documentSnapshot.forEach((doc) => {
+        tempPosts.push({ ...doc.data(), id: doc.id });
+      });
+      setPosts(tempPosts);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const HeaderItems = useCallback(
     () => (
@@ -30,8 +50,8 @@ const DetailSearchScreen = ({ route: { params }, navigation }) => {
     [],
   );
 
-  const renderItem = useCallback(({ item, index }) => {
-    return <SearchItem />;
+  const renderItem = useCallback(({ item }) => {
+    return <SearchItem item={item} />;
   }, []);
 
   return (
@@ -74,10 +94,12 @@ const DetailSearchScreen = ({ route: { params }, navigation }) => {
       </LargeCard>
 
       <FlatList
-        data={Array.from({ length: 60 }, (_, i) => i)}
+        data={resultList}
         renderItem={renderItem}
         ListHeaderComponent={HeaderItems}
-        ListFooterComponent={() => <Spacer h={460} />}
+        ItemSeparatorComponent={<Spacer h={12} />}
+        contentContainerStyle={{ paddingBottom: 12 }}
+        keyExtractor={(item, index) => item?.id || index}
       />
     </Background>
   );

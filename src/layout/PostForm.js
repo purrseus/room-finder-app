@@ -25,7 +25,7 @@ import {
   addressRoomValidator,
   descriptionValidator,
   nameValidator,
-  priceValidator,
+  roomRateValidator,
 } from '../constants';
 import { showTopToast } from '../components/ToastNotification';
 import { launchImageLibraryAsync } from 'expo-image-picker';
@@ -104,7 +104,7 @@ const PostForm = ({
     isOutOfRoom: defaultValues?.isOutOfRoom || false,
   });
 
-  const priceRef = useRef(null);
+  const roomRateRef = useRef(null);
   const areaRef = useRef(null);
   const addressRef = useRef(null);
   const descriptionRef = useRef(null);
@@ -116,22 +116,22 @@ const PostForm = ({
 
   const blurDescription = () => descriptionRef.current?.blur();
 
-  const fefaultFormValues = {
+  const defaultFormValues = {
     title: defaultValues?.title || '',
-    price: defaultValues?.price || '',
+    roomRate: `${defaultValues?.roomRate}` || '',
     address: defaultValues?.address || '',
-    area: defaultValues?.area || '',
+    area: `${defaultValues?.area}` || '',
     description: defaultValues?.description || '',
   };
 
   const { control, handleSubmit } = useForm(
     useMemo(
       () => ({
-        values: fefaultFormValues,
+        values: defaultFormValues,
         resolver: yupResolver(
           yup.object().shape({
             title: nameValidator,
-            price: priceValidator,
+            roomRate: roomRateValidator,
             address: addressRoomValidator,
             area: areaValidator,
             description: descriptionValidator,
@@ -210,14 +210,14 @@ const PostForm = ({
                 errorMessage={error?.message}
                 label="Tiêu đề"
                 returnKeyType="next"
-                onSubmitEditing={focusInput(priceRef)}
+                onSubmitEditing={focusInput(roomRateRef)}
               />
             )}
           />
 
           <Controller
             control={control}
-            name="price"
+            name="roomRate"
             render={({
               field: { onChange, onBlur, value },
               fieldState: { error },
@@ -225,7 +225,7 @@ const PostForm = ({
               <OutlinedTextInput
                 {...{ onChangeText: onChange, onBlur, value }}
                 errorMessage={error?.message}
-                ref={priceRef}
+                ref={roomRateRef}
                 label="Giá phòng/tháng"
                 returnKeyType="next"
                 keyboardType="number-pad"

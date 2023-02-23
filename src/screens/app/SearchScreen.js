@@ -1,6 +1,13 @@
 import { useScrollToTop } from '@react-navigation/native';
-import { useCallback, useRef } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import colors from '../../assets/theme/colors';
 import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
@@ -9,15 +16,55 @@ import IconTextInput from '../../components/IconTextInput';
 import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import Spacer from '../../components/Spacer';
+import { postsSnapshot } from '../../firebase/cloudFirestore';
 import { alphaHexColor } from '../../utils';
 import SearchItem from './components/SearchItem';
 
+const utilityTitle = (text) => {
+  return (
+    {
+      hasAirCondition: 'Điều hòa',
+      hasFridge: 'Tủ lạnh',
+      hasParking: 'Chỗ để xe',
+      hasTV: 'Tivi',
+      hasWaterHeater: 'Nóng lạnh',
+      hasWifi: 'Wifi',
+    }[text] || ''
+  );
+};
+
 const SearchScreen = () => {
   const scrollRef = useRef(null);
+  const [posts, setPosts] = useState([]);
+  const [modalOpened, setModalOpened] = useState(false);
+  const [utilities, setUtilities] = useState({
+    hasWaterHeater: false,
+    hasAirCondition: false,
+    hasWifi: false,
+    hasParking: false,
+    hasFridge: false,
+    hasTV: false,
+  });
+
+  const changeUtilitiesState = (key) => (value) =>
+    setPostInfo((prevState) => ({ ...prevState, [key]: value }));
 
   useScrollToTop(scrollRef);
 
-  const openBottomSheet = () => console.log('open bottom sheet');
+  useEffect(() => {
+    const unsubscribe = postsSnapshot((documentSnapshot) => {
+      const tempPosts = [];
+      documentSnapshot.forEach((doc) => {
+        tempPosts.push({ ...doc.data(), id: doc.id });
+      });
+      setPosts(tempPosts);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const openModal = () => setModalOpened(true);
+  const closeModal = () => setModalOpened(false);
 
   const onSearch = () => console.log('onSearch');
 
@@ -31,8 +78,8 @@ const SearchScreen = () => {
     [],
   );
 
-  const renderItem = useCallback(({ item, index }) => {
-    return <SearchItem />;
+  const renderItem = useCallback(({ item }) => {
+    return <SearchItem item={item} />;
   }, []);
 
   return (
@@ -53,7 +100,7 @@ const SearchScreen = () => {
           placeholder="Nhập phạm vi giá"
           style={styles.input}
         />
-        <TouchableOpacity activeOpacity={1} onPress={openBottomSheet}>
+        <TouchableOpacity activeOpacity={1} onPress={openModal}>
           <IconTextInput
             iconLeft={require('../../assets/icons/menu/menu.png')}
             iconRight={require('../../assets/icons/menu-down/menu-down.png')}
@@ -67,11 +114,28 @@ const SearchScreen = () => {
 
       <FlatList
         ref={scrollRef}
-        data={Array.from({ length: 60 }, (_, i) => i)}
+        data={posts}
         renderItem={renderItem}
         ListHeaderComponent={HeaderItems}
-        ListFooterComponent={() => <Spacer h={460} />}
+        ItemSeparatorComponent={<Spacer h={12} />}
+        contentContainerStyle={{ paddingBottom: 12 }}
+        keyExtractor={(item, index) => item?.id || index}
       />
+
+      <Modal visible={modalOpened} transparent>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={closeModal}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.modalContainer}>
+          {Object.keys(utilities).map((title, index) => (
+            <View key={index}>
+              <Text>{utilityTitle(title)}</Text>
+            </View>
+          ))}
+        </View>
+      </Modal>
     </Background>
   );
 };
@@ -99,6 +163,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 8,
   },
+  modalContainer: {},
 });
 
 export default SearchScreen;

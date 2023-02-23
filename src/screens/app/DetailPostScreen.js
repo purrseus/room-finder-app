@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import {
   StyleSheet,
   Image as RNImage,
@@ -17,7 +18,22 @@ import globalStyles from '../../assets/theme/globalStyles';
 import Button from '../../components/Button';
 import Image from '../../components/Image';
 import Spacer from '../../components/Spacer';
-import { alphaHexColor } from '../../utils';
+import { postSnapshot, userSnapshot } from '../../firebase/cloudFirestore';
+import { alphaHexColor, formatCurrency, formatDate } from '../../utils';
+import { showTopToast } from '../../components/ToastNotification';
+
+const utilityTitle = (text) => {
+  return (
+    {
+      hasAirCondition: 'Điều hòa',
+      hasFridge: 'Tủ lạnh',
+      hasParking: 'Chỗ để xe',
+      hasTV: 'Tivi',
+      hasWaterHeater: 'Nóng lạnh',
+      hasWifi: 'Wifi',
+    }[text] || ''
+  );
+};
 
 const CheckItem = ({ title }) => {
   return (
@@ -31,19 +47,63 @@ const CheckItem = ({ title }) => {
   );
 };
 
-const DetailPostScreen = ({ navigation }) => {
+const DetailPostScreen = ({ navigation, route: { params } }) => {
   const { top, bottom } = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+  const [post, setPost] = useState();
+
+  useEffect(() => {
+    let unsubscribe;
+    if (params?.id) {
+      unsubscribe = postSnapshot(params?.id, (documentSnapshot) => {
+        setPost({
+          ...documentSnapshot.data(),
+          id: documentSnapshot.id,
+        });
+      });
+    }
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    let unsubscribe;
+    if (post?.userId) {
+      unsubscribe = userSnapshot(post?.userId, (documentSnapshot) => {
+        setPost((prevState) => ({
+          ...prevState,
+          user: documentSnapshot.data(),
+        }));
+      });
+    }
+
+    return unsubscribe;
+  }, [post?.userId]);
+
+  const availableUtilities = useMemo(() => {
+    if (!post) return [];
+    return Object.entries(post).filter(
+      ([key, value]) => !!key.startsWith('has') && !!value,
+    );
+  }, [post]);
 
   const goToMaps = async () => {
-    try {
-      open({ provider: Platform.OS === 'ios' ? 'apple' : 'google', query: 'Việt Yên, Bắc Giang' });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    if (!post?.address) return;
 
-  const onCallToPhoneNumber = () => Linking.openURL(`tel:${'0931529903'}`);
+    try {
+      open({
+        provider: Platform.OS === 'ios' ? 'apple' : 'google',
+        query: post?.address,
+      });
+    } catch (error) {
+      showTopToast(error);
+    }
+  };
+
+  const onCallToPhoneNumber = () => {
+    if (post?.user?.phoneNumber)
+      Linking.openURL(`tel:${post?.user?.phoneNumber}`);
+  };
 
   return (
     <View style={globalStyles.flexFill}>
@@ -58,72 +118,91 @@ const DetailPostScreen = ({ navigation }) => {
         />
       </TouchableOpacity>
       <Image
-        source={{ uri: 'https://picsum.photos/300/300' }}
+        source={{ imageStorage: post?.photo }}
         style={{ width, height: height * 0.48 }}
       />
       <View style={[styles.sheet, { height: height * 0.52 + 30 }]}>
         <ScrollView
-          contentContainerStyle={{ paddingTop: 30, paddingHorizontal: 30 }}
+          contentContainerStyle={[{ paddingTop: 30, paddingHorizontal: 30 }, !post && { display: 'none' }]}
         >
           <Text numberOfLines={2} style={styles.title}>
-            Phòng trọ tự quản, có nóng lạnh
+            {post?.title}
           </Text>
           <View style={styles.rowBetween}>
-            <View style={styles.priceWrapper}>
-              <Text style={styles.price}>800.000đ</Text>
+            <View style={styles.roomRateWrapper}>
+              <Text style={styles.roomRate}>
+                {formatCurrency(post?.roomRate)}
+              </Text>
               <Text style={styles.perMonth}> / tháng</Text>
             </View>
-            <Text style={styles.createdAt}>Ngày đăng: 14/11/2022</Text>
+            <Text style={styles.createdAt}>
+              Ngày đăng: {formatDate(post?.createdAt)}
+            </Text>
           </View>
 
           <View style={styles.twoSideContainer}>
             <View style={styles.leftContentContainer}>
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <RNImage
-                    source={require('../../assets/icons/size/size.png')}
-                    style={styles.sizeIcon}
-                  />
+              {!!post?.area && (
+                <View style={styles.row}>
+                  <View style={styles.iconWrapper}>
+                    <RNImage
+                      source={require('../../assets/icons/size/size.png')}
+                      style={styles.sizeIcon}
+                    />
+                  </View>
+                  <Text style={styles.info} numberOfLines={1}>
+                    Diện tích: {post?.area}m2
+                  </Text>
                 </View>
-                <Text style={styles.info} numberOfLines={1}>
-                  Diện tích: 30m2
-                </Text>
-              </View>
+              )}
               <Spacer h={8} />
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <RNImage
-                    source={require('../../assets/icons/map-marker/map-marker.png')}
-                    style={styles.locationIcon}
-                  />
+              {!!post?.address && (
+                <View style={styles.row}>
+                  <View style={styles.iconWrapper}>
+                    <RNImage
+                      source={require('../../assets/icons/map-marker/map-marker.png')}
+                      style={styles.locationIcon}
+                    />
+                  </View>
+                  <Text style={styles.info} numberOfLines={4}>
+                    {post?.address}
+                  </Text>
                 </View>
-                <Text style={styles.info} numberOfLines={2}>
-                  16a , Ngõ 603, Phan Lương Ngọc Quyến, Thái Nguyên
-                </Text>
-              </View>
+              )}
               <Spacer h={8} />
-              <View style={styles.row}>
-                <View style={styles.iconWrapper}>
-                  <RNImage
-                    source={require('../../assets/icons/call/call.png')}
-                    style={styles.callIcon}
-                  />
+              {!!post?.user?.phoneNumber && (
+                <View style={styles.row}>
+                  <View style={styles.iconWrapper}>
+                    <RNImage
+                      source={require('../../assets/icons/call/call.png')}
+                      style={styles.callIcon}
+                    />
+                  </View>
+                  <Text style={styles.info} numberOfLines={2}>
+                    {post?.user?.phoneNumber}
+                  </Text>
                 </View>
-                <Text style={styles.info} numberOfLines={2}>
-                  0931529903
-                </Text>
-              </View>
+              )}
             </View>
             <Spacer w={16} />
             <View style={styles.rightContentContainer}>
               <View style={styles.row}>
                 <View
-                  style={[styles.dot, { backgroundColor: colors.primary }]}
+                  style={[
+                    styles.dot,
+                    {
+                      backgroundColor: post?.isOutOfRoom
+                        ? colors.orange
+                        : colors.primary,
+                    },
+                  ]}
                 />
-                <Text style={styles.statusText}>Còn phòng</Text>
+                <Text style={styles.statusText}>
+                  {post?.isOutOfRoom ? 'Hết phòng' : 'Còn phòng'}
+                </Text>
               </View>
               <Spacer h={8} />
-              <Text style={styles.owner}>Chủ trọ: Trần Tuấn Vũ</Text>
+              <Text style={styles.owner}>Chủ trọ: {post?.user?.name}</Text>
               <Spacer h={8} />
               <Text onPress={goToMaps} style={styles.hyperLink}>
                 Xem trên Google Map
@@ -134,27 +213,23 @@ const DetailPostScreen = ({ navigation }) => {
           <View style={styles.divider} />
 
           <Text style={styles.subTitle}>Miêu tả</Text>
-          <Text style={styles.description}>
-            Phòng trọ tự quản của chúng tôi có tất cả những tiện ích cần thiết
-            để cung cấp cho khách hàng một môi trường nghỉ ngơi tốt nhất. Đặc
-            biệt, phòng có điều hoà nóng lạnh tự động đảm bảo cho khách hàng một
-            nền môi trường sạch và thoáng mát mọi lúc. Hãy đến với chúng tôi để
-            tận hưởng một kỳ nghỉ tuyệt vời!
-          </Text>
+          <Text style={styles.description}>{post?.description}</Text>
 
           <Text style={styles.subTitle}>Tiện ích</Text>
 
           <View style={styles.checkContainer}>
-            {['Nóng lạnh', 'Chỗ để xe', 'Điều hoà', 'Wifi'].map((text) => (
-              <CheckItem key={text} title={text} />
+            {availableUtilities.map(([text]) => (
+              <CheckItem key={text} title={utilityTitle(text)} />
             ))}
           </View>
         </ScrollView>
-        <Button
-          title="Liên hệ"
-          onPress={onCallToPhoneNumber}
-          style={[styles.button, { marginBottom: bottom || 16 }]}
-        />
+        {!!post?.user?.phoneNumber && (
+          <Button
+            title="Liên hệ"
+            onPress={onCallToPhoneNumber}
+            style={[styles.button, { marginBottom: bottom || 16 }]}
+          />
+        )}
       </View>
     </View>
   );
@@ -184,11 +259,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  priceWrapper: {
+  roomRateWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  price: {
+  roomRate: {
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.primary,

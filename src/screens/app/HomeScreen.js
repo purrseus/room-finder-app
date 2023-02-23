@@ -1,5 +1,5 @@
 import { useScrollToTop } from '@react-navigation/native';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import colors from '../../assets/theme/colors';
 import globalStyles from '../../assets/theme/globalStyles';
@@ -9,14 +9,28 @@ import IconTextInput from '../../components/IconTextInput';
 import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import Spacer from '../../components/Spacer';
+import { postsSnapshot } from '../../firebase/cloudFirestore';
 import { alphaHexColor } from '../../utils';
 import HomeItem from './components/HomeItem';
 
 const HomeScreen = ({ navigation }) => {
   const scrollRef = useRef(null);
   const [searchText, setSearchText] = useState('');
+  const [posts, setPosts] = useState([]);
 
   useScrollToTop(scrollRef);
+
+  useEffect(() => {
+    const unsubscribe = postsSnapshot((documentSnapshot) => {
+      const tempPosts = [];
+      documentSnapshot.forEach((doc) => {
+        tempPosts.push({ ...doc.data(), id: doc.id });
+      });
+      setPosts(tempPosts);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const onSearch = () => {
     if (searchText.trim().length)
@@ -27,14 +41,14 @@ const HomeScreen = ({ navigation }) => {
     () => (
       <View style={styles.listTitleContainer}>
         <Text style={styles.listTitle}>Danh sách phòng thêm mới</Text>
-        <Text style={styles.countItem}>{100} kết quả</Text>
+        <Text style={styles.countItem}>{posts.length} kết quả</Text>
       </View>
     ),
-    [],
+    [posts],
   );
 
-  const renderItem = useCallback(({ item, index }) => {
-    return <HomeItem />;
+  const renderItem = useCallback(({ item }) => {
+    return <HomeItem item={item} />;
   }, []);
 
   return (
@@ -56,10 +70,10 @@ const HomeScreen = ({ navigation }) => {
 
       <FlatList
         ref={scrollRef}
-        data={Array.from({ length: 60 }, (_, i) => i)}
+        data={posts}
         renderItem={renderItem}
         ListHeaderComponent={HeaderItems}
-        ListFooterComponent={() => <Spacer h={360} />}
+        keyExtractor={(item, index) => item?.id || index}
       />
     </Background>
   );

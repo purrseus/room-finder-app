@@ -10,7 +10,6 @@ import {
   where,
 } from 'firebase/firestore';
 import { firebaseCloudFirestore } from '.';
-import { firebaseUpdateUser } from './auth';
 import { uploadImage } from './storage';
 
 export const checkUserExistWithEmail = async (email) => {
@@ -82,6 +81,8 @@ export const createPost = async (value) => {
 
   await setDoc(doc(firebaseCloudFirestore, 'posts', `${+new Date()}`), {
     ...value,
+    ...(!!value?.roomRate && { roomRate: +value?.roomRate }),
+    ...(!!value?.area && { area: +value?.area }),
     approved: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -98,6 +99,8 @@ export const updatePost = async (postId, value) => {
     doc(firebaseCloudFirestore, 'posts', postId),
     {
       ...value,
+      ...(!!value?.roomRate && { roomRate: +value?.roomRate }),
+      ...(!!value?.area && { area: +value?.area }),
       updatedAt: new Date().toISOString(),
     },
     { merge: true },
@@ -109,6 +112,34 @@ export const myPostsSnapshot = (userId, cb) => {
     collection(firebaseCloudFirestore, 'posts'),
     where('deletedAt', '==', null),
     where('userId', '==', userId),
+    orderBy('updatedAt', 'desc'),
+  );
+  return onSnapshot(q, cb);
+};
+
+export const postsSnapshot = (cb) => {
+  const q = query(
+    collection(firebaseCloudFirestore, 'posts'),
+    where('deletedAt', '==', null),
+    where('approved', '==', true),
+    orderBy('updatedAt', 'desc'),
+  );
+  return onSnapshot(q, cb);
+};
+
+export const postSnapshot = (postId, cb) => {
+  return onSnapshot(doc(firebaseCloudFirestore, 'posts', postId), cb);
+};
+
+// FIXME
+export const searchPostsSnapshot = (queryText, cb) => {
+  const q = query(
+    collection(firebaseCloudFirestore, 'posts'),
+    where('deletedAt', '==', null),
+    where('approved', '==', true),
+    where('address', '>=', queryText),
+    where('address', '<=', queryText + '\uf8ff'),
+    orderBy('address'),
     orderBy('updatedAt', 'desc'),
   );
   return onSnapshot(q, cb);

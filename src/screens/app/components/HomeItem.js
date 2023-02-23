@@ -3,12 +3,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '../../../assets/theme/colors';
 import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
-import { alphaHexColor, shadowGenerator } from '../../../utils';
+import { alphaHexColor, formatCurrency, shadowGenerator } from '../../../utils';
 
-const HomeItem = () => {
+const HomeItem = ({ item }) => {
   const navigation = useNavigation();
   const goToDetail = () => {
-    navigation.navigate('DetailPost');
+    navigation.navigate('DetailPost', { id: item?.id });
   };
 
   return (
@@ -19,25 +19,25 @@ const HomeItem = () => {
     >
       <Image
         style={styles.image}
-        source={{ uri: 'https://picsum.photos/100/100' }}
+        source={{ imageStorage: item?.photo }}
       />
       <Spacer w={14} />
       <View style={styles.contentContainer}>
         <View>
           <Text style={styles.name} numberOfLines={1}>
-            Phòng trọ tự quản, có nóng lạnh
+            {item?.title}
           </Text>
-          <Text style={styles.address}>Lương Ngọc Quyến, Thái Nguyên</Text>
-          <View style={styles.priceWrapper}>
-            <Text style={styles.price}>800.000đ</Text>
+          <Text style={styles.address}>{item?.address}</Text>
+          <View style={styles.roomRateWrapper}>
+            <Text style={styles.roomRate}>{formatCurrency(item?.roomRate)}</Text>
             <Text style={styles.perMonth}> / tháng</Text>
           </View>
         </View>
 
         <View style={styles.statusWrapper}>
-          <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+          <View style={[styles.dot, { backgroundColor: item?.isOutOfRoom ? colors.orange : colors.primary }]} />
           <Spacer w={6} />
-          <Text style={styles.statusText}>Còn phòng</Text>
+          <Text style={styles.statusText}>{item?.isOutOfRoom ? 'Hết phòng' : 'Còn phòng'}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -75,11 +75,11 @@ const styles = StyleSheet.create({
     color: alphaHexColor(colors.black, 0.6),
     flexShrink: 1,
   },
-  priceWrapper: {
+  roomRateWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  price: {
+  roomRate: {
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.primary,

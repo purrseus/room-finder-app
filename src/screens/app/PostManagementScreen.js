@@ -68,7 +68,7 @@ const PostManagementScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <FlatList ref={scrollRef} data={posts} renderItem={renderItem} />
+        <FlatList ref={scrollRef} data={posts} renderItem={renderItem} keyExtractor={(item, index) => item?.id || index} />
       </View>
     </Background>
   );

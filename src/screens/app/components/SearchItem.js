@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,55 +10,78 @@ import {
 import colors from '../../../assets/theme/colors';
 import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
-import { alphaHexColor, shadowGenerator } from '../../../utils';
+import { alphaHexColor, formatCurrency, shadowGenerator } from '../../../utils';
 
-const SearchItem = () => {
+const utilityTitle = (text) => {
+  return (
+    {
+      hasAirCondition: 'Điều hòa',
+      hasFridge: 'Tủ lạnh',
+      hasParking: 'Chỗ để xe',
+      hasTV: 'Tivi',
+      hasWaterHeater: 'Nóng lạnh',
+      hasWifi: 'Wifi',
+    }[text] || ''
+  );
+};
+
+const SearchItem = ({ item }) => {
   const navigation = useNavigation();
+
   const goToDetail = () => {
-    navigation.navigate('DetailPost');
+    navigation.navigate('DetailPost', { id: item?.id });
   };
+
+  const availableUtilities = useMemo(() => {
+    if (!item) return '';
+    return Object.entries(item)
+      .filter(([key, value]) => !!key.startsWith('has') && !!value)
+      .map(([text]) => utilityTitle(text))
+      .join(', ');
+  }, [item]);
+
   return (
     <TouchableOpacity
       onPress={goToDetail}
       activeOpacity={1}
       style={styles.container}
     >
-      <Image
-        source={{ uri: 'https://picsum.photos/300/300' }}
-        style={styles.image}
-      />
+      <Image source={{ imageStorage: item?.photo }} style={styles.image} />
       <Spacer h={16} />
       <View style={styles.contentContainer}>
         <View style={styles.leftContentContainer}>
           <Text style={styles.address} numberOfLines={2}>
-            Phan Đình Phùng, Thái Nguyên
+            {item?.address}
           </Text>
           <Text style={styles.title} numberOfLines={2}>
-            Phòng trọ sinh viên giá rẻ
+            {item?.title}
           </Text>
           <View style={styles.utilitiesWrapper}>
             <RNImage
               source={require('../../../assets/icons/utilities/utilities.png')}
             />
-            <Text style={styles.utilitiesText} numberOfLines={2}>
-              Nóng lạnh, Điều hoà, Wifi
-            </Text>
+            {!!availableUtilities.length && (
+              <Text style={styles.utilitiesText} numberOfLines={2}>
+                {availableUtilities}
+              </Text>
+            )}
           </View>
         </View>
         <View style={styles.rightContentContainer}>
-          <View style={styles.priceWrapper}>
-            <Text style={styles.price} numberOfLines={1}>
-              800.000đ
+          <View style={styles.roomRateWrapper}>
+            <Text style={styles.roomRate} numberOfLines={1}>
+              {formatCurrency(item?.roomRate)}
             </Text>
             <Text style={styles.perMonth} numberOfLines={1}>
               {' '}
               / tháng
             </Text>
           </View>
+          <Spacer h={8} />
           <View style={styles.statusWrapper}>
-            <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+            <View style={[styles.dot, { backgroundColor: item?.isOutOfRoom ? colors.orange : colors.primary }]} />
             <Spacer w={6} />
-            <Text style={styles.statusText}>Còn phòng</Text>
+            <Text style={styles.statusText}>{item?.isOutOfRoom ? 'Hết phòng' : 'Còn phòng'}</Text>
           </View>
         </View>
       </View>
@@ -73,7 +97,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     padding: 12,
     paddingBottom: 20,
-    marginVertical: 6,
   },
   image: {
     flex: 1,
@@ -89,7 +112,6 @@ const styles = StyleSheet.create({
   },
   rightContentContainer: {
     flex: 4,
-    justifyContent: 'space-between',
     paddingHorizontal: 8,
   },
   address: {
@@ -115,12 +137,12 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flexShrink: 1,
   },
-  priceWrapper: {
+  roomRateWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     flexShrink: 1,
   },
-  price: {
+  roomRate: {
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.primary,

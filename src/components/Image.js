@@ -9,7 +9,7 @@ const Image = ({ style, source, ...props }) => {
   const [image, setImage] = useState(source);
 
   useEffect(() => {
-    if (typeof source === 'object' && 'imageStorage' in source) {
+    if (typeof source === 'object' && source.imageStorage) {
       (async () => {
         try {
           const url = await getDownloadURL(
