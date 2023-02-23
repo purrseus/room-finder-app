@@ -1,13 +1,6 @@
 import { useScrollToTop } from '@react-navigation/native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  FlatList,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import colors from '../../assets/theme/colors';
 import globalStyles from '../../assets/theme/globalStyles';
 import Background from '../../components/Background';
@@ -17,21 +10,9 @@ import LargeCard from '../../components/LargeCard';
 import LargeTitle from '../../components/LargeTitle';
 import Spacer from '../../components/Spacer';
 import { postsSnapshot } from '../../firebase/cloudFirestore';
-import { alphaHexColor } from '../../utils';
+import { alphaHexColor, shadowGenerator } from '../../utils';
 import SearchItem from './components/SearchItem';
-
-const utilityTitle = (text) => {
-  return (
-    {
-      hasAirCondition: 'Điều hòa',
-      hasFridge: 'Tủ lạnh',
-      hasParking: 'Chỗ để xe',
-      hasTV: 'Tivi',
-      hasWaterHeater: 'Nóng lạnh',
-      hasWifi: 'Wifi',
-    }[text] || ''
-  );
-};
+import UtilitiesModal from './components/UtilitiesModal';
 
 const SearchScreen = () => {
   const scrollRef = useRef(null);
@@ -47,7 +28,7 @@ const SearchScreen = () => {
   });
 
   const changeUtilitiesState = (key) => (value) =>
-    setPostInfo((prevState) => ({ ...prevState, [key]: value }));
+    setUtilities((prevState) => ({ ...prevState, [key]: value }));
 
   useScrollToTop(scrollRef);
 
@@ -63,8 +44,12 @@ const SearchScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  const openModal = () => setModalOpened(true);
-  const closeModal = () => setModalOpened(false);
+  const openModal = () => {
+    setModalOpened(true);
+  };
+  const closeModal = () => {
+    setModalOpened(false);
+  };
 
   const onSearch = () => console.log('onSearch');
 
@@ -122,20 +107,12 @@ const SearchScreen = () => {
         keyExtractor={(item, index) => item?.id || index}
       />
 
-      <Modal visible={modalOpened} transparent>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={closeModal}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.modalContainer}>
-          {Object.keys(utilities).map((title, index) => (
-            <View key={index}>
-              <Text>{utilityTitle(title)}</Text>
-            </View>
-          ))}
-        </View>
-      </Modal>
+      <UtilitiesModal
+        visible={modalOpened}
+        data={utilities}
+        onClose={closeModal}
+        onPressItem={changeUtilitiesState}
+      />
     </Background>
   );
 };
@@ -163,7 +140,26 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 8,
   },
-  modalContainer: {},
+  modalContainer: {
+    backgroundColor: colors.white,
+    marginHorizontal: 60,
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: colors.primary,
+    ...shadowGenerator(8),
+    top: 306,
+  },
+  modalItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalItemLabel: {
+    fontSize: 12,
+    color: alphaHexColor(colors.black, 0.6),
+    flexShrink: 1,
+  },
 });
 
 export default SearchScreen;

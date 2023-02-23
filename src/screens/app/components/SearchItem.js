@@ -10,20 +10,7 @@ import {
 import colors from '../../../assets/theme/colors';
 import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
-import { alphaHexColor, formatCurrency, shadowGenerator } from '../../../utils';
-
-const utilityTitle = (text) => {
-  return (
-    {
-      hasAirCondition: 'Điều hòa',
-      hasFridge: 'Tủ lạnh',
-      hasParking: 'Chỗ để xe',
-      hasTV: 'Tivi',
-      hasWaterHeater: 'Nóng lạnh',
-      hasWifi: 'Wifi',
-    }[text] || ''
-  );
-};
+import { alphaHexColor, formatCurrency, shadowGenerator, utilityTitle } from '../../../utils';
 
 const SearchItem = ({ item }) => {
   const navigation = useNavigation();

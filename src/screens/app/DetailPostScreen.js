@@ -19,21 +19,8 @@ import Button from '../../components/Button';
 import Image from '../../components/Image';
 import Spacer from '../../components/Spacer';
 import { postSnapshot, userSnapshot } from '../../firebase/cloudFirestore';
-import { alphaHexColor, formatCurrency, formatDate } from '../../utils';
+import { alphaHexColor, formatCurrency, formatDate, utilityTitle } from '../../utils';
 import { showTopToast } from '../../components/ToastNotification';
-
-const utilityTitle = (text) => {
-  return (
-    {
-      hasAirCondition: 'Điều hòa',
-      hasFridge: 'Tủ lạnh',
-      hasParking: 'Chỗ để xe',
-      hasTV: 'Tivi',
-      hasWaterHeater: 'Nóng lạnh',
-      hasWifi: 'Wifi',
-    }[text] || ''
-  );
-};
 
 const CheckItem = ({ title }) => {
   return (

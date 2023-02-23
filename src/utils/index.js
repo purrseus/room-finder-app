@@ -60,3 +60,16 @@ export const formatTextToSearch = (string = '') => {
 
   return str;
 };
+
+export const utilityTitle = (text) => {
+  return (
+    {
+      hasAirCondition: 'Điều hòa',
+      hasFridge: 'Tủ lạnh',
+      hasParking: 'Chỗ để xe',
+      hasTV: 'Tivi',
+      hasWaterHeater: 'Nóng lạnh',
+      hasWifi: 'Wifi',
+    }[text] || ''
+  );
+};
