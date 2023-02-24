@@ -107,6 +107,18 @@ export const updatePost = async (postId, value) => {
   );
 };
 
+export const deletePost = async (postId) => {
+  if (!postId) return;
+
+  await setDoc(
+    doc(firebaseCloudFirestore, 'posts', postId),
+    {
+      deletedAt: new Date().toISOString(),
+    },
+    { merge: true },
+  );
+};
+
 export const myPostsSnapshot = (userId, cb) => {
   const q = query(
     collection(firebaseCloudFirestore, 'posts'),

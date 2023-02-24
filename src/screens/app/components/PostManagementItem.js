@@ -4,29 +4,65 @@ import colors from '../../../assets/theme/colors';
 import Image from '../../../components/Image';
 import Spacer from '../../../components/Spacer';
 import { alphaHexColor, formatCurrency, shadowGenerator } from '../../../utils';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { deletePost } from '../../../firebase/cloudFirestore';
+import { showTopToast } from '../../../components/ToastNotification';
+
+const actionSheetOptions = ['Xóa bài đăng', 'Hủy'];
+const destructiveButtonIndex = 0;
+const cancelButtonIndex = 1;
 
 const PostManagementItem = ({ item }) => {
   const navigation = useNavigation();
+  const { showActionSheetWithOptions } = useActionSheet();
 
   const onEditPost = () => {
     navigation.navigate('EditPost', { defaultValues: item });
+  };
+
+  const onShowActionSheet = () => {
+    if (!item?.id) return;
+
+    showActionSheetWithOptions(
+      {
+        options: actionSheetOptions,
+        destructiveButtonIndex,
+        cancelButtonIndex,
+      },
+      async (selectedIndex) => {
+        try {
+          switch (selectedIndex) {
+            case destructiveButtonIndex:
+              await deletePost(item.id);
+              showTopToast('Đã xóa bài đăng!', true);
+              break;
+  
+            case cancelButtonIndex:
+              // Canceled
+              break;
+          }
+        } catch (error) {
+          showTopToast(error);
+        }
+      },
+    );
   };
 
   return (
     <TouchableOpacity
       activeOpacity={1}
       onPress={onEditPost}
+      onLongPress={onShowActionSheet}
       style={styles.container}
     >
-      <Image
-        style={styles.image}
-        source={{ imageStorage: item?.photo }}
-      />
+      <Image style={styles.image} source={{ imageStorage: item?.photo }} />
       <Spacer w={14} />
       <View style={styles.contentContainer}>
         <View>
           <View style={styles.roomRateWrapper}>
-            <Text style={styles.roomRate}>{formatCurrency(item?.roomRate)}</Text>
+            <Text style={styles.roomRate}>
+              {formatCurrency(item?.roomRate)}
+            </Text>
           </View>
           <Text style={styles.name} numberOfLines={1}>
             {item?.title}
@@ -35,9 +71,20 @@ const PostManagementItem = ({ item }) => {
         </View>
 
         <View style={styles.statusWrapper}>
-          <View style={[styles.dot, { backgroundColor: !item?.approved ? colors.orange : colors.primary }]} />
+          <View
+            style={[
+              styles.dot,
+              {
+                backgroundColor: !item?.approved
+                  ? colors.orange
+                  : colors.primary,
+              },
+            ]}
+          />
           <Spacer w={6} />
-          <Text style={styles.statusText}>{item?.approved ? 'Đã đăng' : 'Chưa duyệt'}</Text>
+          <Text style={styles.statusText}>
+            {item?.approved ? 'Đã đăng' : 'Chưa duyệt'}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>

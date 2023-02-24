@@ -118,9 +118,9 @@ const PostForm = ({
 
   const defaultFormValues = {
     title: defaultValues?.title || '',
-    roomRate: `${defaultValues?.roomRate}` || '',
+    roomRate: `${defaultValues?.roomRate || ''}`,
     address: defaultValues?.address || '',
-    area: `${defaultValues?.area}` || '',
+    area: `${defaultValues?.area || ''}`,
     description: defaultValues?.description || '',
   };
 
