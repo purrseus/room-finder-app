@@ -58,7 +58,7 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const forgotPassword = () => null;
+  // const forgotPassword = () => null;
 
   return (
     <Background keyboardScrollView style={globalStyles.flexFill}>
@@ -138,12 +138,12 @@ const LoginScreen = ({ navigation }) => {
               Sign up here
             </Text>
           </View>
-          <Text
+          {/* <Text
             onPress={forgotPassword}
             style={[styles.bottomButtonText, styles.forgotPassText]}
           >
             Quên mật khẩu
-          </Text>
+          </Text> */}
         </View>
       </LargeCard>
     </Background>

@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 export const INCORRECT_PASSWORD = 'Mật khẩu sai!';
 const INVALID_FORMAT = 'Định dạng sai!';
-const REQUIRED_FIELD = 'Trường này là bắc buộc!';
+const REQUIRED_FIELD = 'Yêu cầu không bỏ trống!';
 const INVALID_SPACES = 'Không được có khoảng trắng ở đầu và cuối';
 const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g;
