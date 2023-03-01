@@ -197,7 +197,14 @@ const PostForm = ({
       <KeyboardAwareScrollView
         style={[styles.body, { marginTop: height * 0.15 - top }]}
       >
-        <LargeCard style={{ marginTop: 16, marginBottom: bottom || 32 }}>
+        <LargeCard
+          style={{
+            marginTop: 16,
+            marginBottom: bottom || 32,
+            marginHorizontal: 16,
+            paddingHorizontal: 20,
+          }}
+        >
           <Controller
             control={control}
             name="title"
