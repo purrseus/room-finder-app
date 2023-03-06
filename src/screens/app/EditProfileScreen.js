@@ -122,6 +122,7 @@ const EditProfileScreen = ({ navigation }) => {
                 autoCapitalize="none"
                 returnKeyType="next"
                 onSubmitEditing={focusInput(addressInputRef)}
+                editable={false}
               />
             )}
           />

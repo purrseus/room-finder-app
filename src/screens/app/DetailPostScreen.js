@@ -21,6 +21,7 @@ import Spacer from '../../components/Spacer';
 import { postSnapshot, userSnapshot } from '../../firebase/cloudFirestore';
 import { alphaHexColor, formatCurrency, formatDate, utilityTitle } from '../../utils';
 import { showTopToast } from '../../components/ToastNotification';
+import numeral from 'numeral';
 
 const CheckItem = ({ title }) => {
   return (
@@ -138,7 +139,7 @@ const DetailPostScreen = ({ navigation, route: { params } }) => {
                     />
                   </View>
                   <Text style={styles.info} numberOfLines={1}>
-                    Diện tích: {post?.area}m2
+                    Diện tích: {numeral(post?.area).format('0,0')}m2
                   </Text>
                 </View>
               )}

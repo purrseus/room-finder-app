@@ -31,6 +31,7 @@ import { showTopToast } from '../components/ToastNotification';
 import { launchImageLibraryAsync } from 'expo-image-picker';
 import useFirebaseAuthState from '../hooks/useFirebaseAuthState';
 import Image from '../components/Image';
+import numeral from 'numeral';
 
 const RadioButton = ({ label, value, currentValue, setIsChecked }) => {
   return (
@@ -159,11 +160,20 @@ const PostForm = ({
     }
   };
 
+  const onChangeNumberInput = (onChange, text) => {
+    const rawNumber = text.replace(/\D/g, '');
+    onChange(rawNumber);
+  };
+
   const onSubmit = (values) => {
     handleButtonPress({
       ...values,
       ...postInfo,
       userId: user?.id,
+      ...(!!values?.roomRate && {
+        roomRate: values?.roomRate?.replace(/\D/g, ''),
+      }),
+      ...(!!values?.area && { area: values?.area?.replace(/\D/g, '') }),
     });
   };
 
@@ -230,7 +240,11 @@ const PostForm = ({
               fieldState: { error },
             }) => (
               <OutlinedTextInput
-                {...{ onChangeText: onChange, onBlur, value }}
+                {...{
+                  onChangeText: (text) => onChangeNumberInput(onChange, text),
+                  onBlur,
+                  value: value ? numeral(value).format('0,0') : '',
+                }}
                 errorMessage={error?.message}
                 ref={roomRateRef}
                 label="Giá phòng/tháng"
@@ -268,7 +282,11 @@ const PostForm = ({
               fieldState: { error },
             }) => (
               <OutlinedTextInput
-                {...{ onChangeText: onChange, onBlur, value }}
+                {...{
+                  onChangeText: (text) => onChangeNumberInput(onChange, text),
+                  onBlur,
+                  value: value ? numeral(value).format('0,0') : '',
+                }}
                 errorMessage={error?.message}
                 ref={areaRef} // TODO: format currency input
                 label="Diện tích (m2)"
@@ -354,9 +372,10 @@ const PostForm = ({
                 }
                 resizeMode="cover"
                 style={{
-                  width: width - 30 * 4,
-                  height: width - 30 * 4,
+                  width: width - 34 * 2,
+                  height: width - 34 * 2,
                   borderRadius: 4,
+                  alignSelf: 'center',
                 }}
               />
             ) : (

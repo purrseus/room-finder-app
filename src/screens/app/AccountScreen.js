@@ -1,7 +1,7 @@
 import { launchImageLibraryAsync } from 'expo-image-picker';
 import {
   Image as RNImage,
-  Linking,
+  // Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -33,9 +33,9 @@ const AccountScreen = ({ navigation }) => {
 
   const goToEditProfile = () => navigation.navigate('EditProfile');
 
-  const onCallToPhoneNumber = () => {
-    if (user?.phoneNumber) Linking.openURL(`tel:${user?.phoneNumber}`);
-  };
+  // const onCallToPhoneNumber = () => {
+  //   if (user?.phoneNumber) Linking.openURL(`tel:${user?.phoneNumber}`);
+  // };
 
   const onChangeAvatar = async () => {
     try {
@@ -96,14 +96,15 @@ const AccountScreen = ({ navigation }) => {
         <LargeTitle style={styles.username}>{user?.name}</LargeTitle>
         {!!user?.address && <Text style={styles.address}>{user.address}</Text>}
         <ScrollView>
-          <TouchableOpacity
+          <Spacer h={40} />
+          {/* <TouchableOpacity
             style={styles.callButton}
             activeOpacity={1}
             onPress={onCallToPhoneNumber}
           >
             <RNImage source={require('../../assets/icons/call/call.png')} />
             <Text style={styles.callMeText}>Call me</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={styles.infoContainer}>
             <View style={styles.infoItem}>
